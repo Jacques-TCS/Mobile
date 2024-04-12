@@ -1,29 +1,24 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:mobile/components/menu_inferior.dart';
 
-const String nome = 'Beto';
-class Home extends StatefulWidget {
-  const Home({super.key});
-  final int currentIndex = 0;
+class Agenda extends StatefulWidget {
+  const Agenda({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Agenda> createState() => _AgendaState();
 }
 
-class _HomeState extends State<Home> {
-  // This widget is the root of your application.
+class _AgendaState extends State<Agenda> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
+      backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(233, 248, 255, 1),
           title: const Text('Agenda'),
           automaticallyImplyLeading: false,
         ),
-        bottomNavigationBar: MenuInferior(currentIndex: widget.currentIndex),
         body: Center(
           child: Column(
             children: [
@@ -35,7 +30,7 @@ class _HomeState extends State<Home> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                        'Bem-vindo, $nome',
+                        'Bem-vindo, Fulano(a)',
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           color: Color.fromRGBO(1, 28, 57, 1),
@@ -52,6 +47,6 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-      );
+    );
   }
 }

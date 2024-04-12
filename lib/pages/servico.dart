@@ -1,9 +1,9 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+
 import 'package:flutter/material.dart';
-import 'package:mobile/components/menu_inferior.dart';
 
 class Servico extends StatefulWidget {
   const Servico({super.key});
-  // final int currentIndex = 0;
 
   @override
   State<Servico> createState() => _ServicoState();

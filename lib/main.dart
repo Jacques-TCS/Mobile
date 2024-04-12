@@ -1,13 +1,21 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:mobile/pages/home.dart';
+import 'package:flutter/services.dart';
+import 'package:mobile/pages/agenda.dart';
+import 'package:mobile/components/navbar.dart';
 import 'package:mobile/pages/login.dart';
 import 'package:mobile/pages/perfil.dart';
-import 'package:mobile/pages/qrcode.dart';
+import 'package:mobile/components/qrcode.dart';
+import 'package:mobile/pages/resetar_senha_login.dart';
+import 'package:mobile/pages/resetar_senha_perfil.dart';
 import 'package:mobile/pages/servico.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
   runApp(const MyApp());
 }
 
@@ -23,9 +31,12 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/home': (context) => Home(),
+        '/agenda': (context) => Agenda(),
         '/perfil': (context) => Perfil(),
         '/qrcode': (context) => QRCode(),
         '/servico': (context) => Servico(),
+        '/resetar_senha_login': (context) => ResetarSenhaLogin(),
+        '/resetar_senha_perfil': (context) => ResetarSenhaPerfil(),
       },
     );
   }

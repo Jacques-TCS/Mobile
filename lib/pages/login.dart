@@ -48,7 +48,7 @@ class Login extends StatelessWidget {
 
             // input senha
             Padding(
-              padding: EdgeInsets.only(right: 60, left: 60, bottom: 20),
+              padding: EdgeInsets.only(right: 60, left: 60),
               child: TextField(
                 obscureText: true,
                 enableSuggestions: false,
@@ -77,19 +77,30 @@ class Login extends StatelessWidget {
 
             // botao esqueci a senha
             Padding(
-              padding: const EdgeInsets.only(bottom: 60.0),
-              child: Text("Esqueci minha senha",
-                  style: TextStyle(
-                    color: Color.fromRGBO(202, 234, 248, 1),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600
-                  ),
-                  textAlign: TextAlign.center),
+              padding: const EdgeInsets.symmetric(horizontal: 120.0, vertical: 10),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/resetar_senha_login');
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Esqueci minha senha",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             // botao entrar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 100.0),
+              padding: const EdgeInsets.symmetric(horizontal: 80.0),
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/home');

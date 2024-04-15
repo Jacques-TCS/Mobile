@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:mobile/pages/agenda.dart';
 import 'package:mobile/pages/perfil.dart';
 import 'package:mobile/components/qrcode.dart';
-import 'package:mobile/pages/resetar_senha_perfil.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -37,9 +36,8 @@ class _HomeState extends State<Home> {
               controller: paginaController,
               children: [
                 Agenda(),
-                QRCode(),
+                QRCode(paginaController: paginaController),
                 Perfil(),
-                ResetarSenhaPerfil(),
               ],
               onPageChanged: (pagina) {
                 setState(() {
@@ -47,6 +45,8 @@ class _HomeState extends State<Home> {
                 });
               },
             ),
+
+            // botao qr code 
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
             floatingActionButton: FloatingActionButton(
               backgroundColor: Color.fromRGBO(220, 242, 252, 1),
@@ -64,6 +64,8 @@ class _HomeState extends State<Home> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget> [
+
+                  //botao agenda 
                   InkResponse(
                     onTap: () {
                       paginaController.jumpToPage(0);
@@ -77,6 +79,8 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Padding(padding: EdgeInsets.only(right: 40)),
+
+                  // botao perfil
                   InkResponse(
                     onTap: () {
                       paginaController.jumpToPage(2);

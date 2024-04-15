@@ -34,7 +34,7 @@ class ResetarSenhaLogin extends StatelessWidget {
             textAlign: TextAlign.center
             ),
 
-            // input usuario
+            // input email
             Padding(
               padding:
                   EdgeInsets.only(right: 60, left: 60, top: 60.0, bottom: 60.0),
@@ -61,7 +61,7 @@ class ResetarSenhaLogin extends StatelessWidget {
               ),
             ),
 
-            // botao entrar
+            // botao solicitar nova senha
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 80.0),
               child: ElevatedButton(

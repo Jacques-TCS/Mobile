@@ -18,7 +18,7 @@ class ResetarSenhaPerfil extends StatelessWidget {
               leading: IconButton(
                 icon: Icon(Icons.arrow_back, color: Color.fromRGBO(1, 28, 57, 1)),
                 onPressed: () {
-                  // TODO
+                  Navigator.pop(context);
                 },
               ),
             ),

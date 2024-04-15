@@ -13,9 +13,10 @@ import 'package:mobile/pages/servico.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-  ));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ),
+  );
   runApp(const MyApp());
 }
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => Home(),
         '/agenda': (context) => Agenda(),
         '/perfil': (context) => Perfil(),
-        '/qrcode': (context) => QRCode(),
+        '/qrcode': (context) => QRCode(paginaController: PageController()),
         '/servico': (context) => Servico(),
         '/resetar_senha_login': (context) => ResetarSenhaLogin(),
         '/resetar_senha_perfil': (context) => ResetarSenhaPerfil(),

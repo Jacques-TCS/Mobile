@@ -11,7 +11,7 @@ class Login extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color.fromRGBO(1, 28, 57, 1),
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(1, 28, 57, 1), // Status bar color
+        backgroundColor: Color.fromRGBO(1, 28, 57, 1),
       ),
       body: Center(
         child: ListView(
@@ -27,7 +27,7 @@ class Login extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Usuário',
                   labelStyle: TextStyle(
-                    color: Colors.white38,
+                    color: Colors.white,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius:
@@ -56,7 +56,7 @@ class Login extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Senha',
                   labelStyle: TextStyle(
-                    color: Colors.white38,
+                    color: Colors.white,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius:

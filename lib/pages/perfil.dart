@@ -25,22 +25,34 @@ class _PerfilState extends State<Perfil> {
             body: Center(
               child: Column(
                 children: <Widget>[
-                  SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          right: 16, left: 16, top: 32),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.25),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                          spreadRadius: 0.1
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 100,
+                      backgroundColor: Color.fromRGBO(123, 210, 246, 1),
                       child: Icon(
                         Icons.person_rounded,
                         size: 120,
+                        color: Color.fromRGBO(1, 28, 57, 1),
                       ),
                     ),
                   ),
                   SizedBox(
                     child: Padding(
                       padding: const EdgeInsets.only(
-                          right: 16, left: 16, bottom: 60),
+                          right: 16, left: 16, bottom: 60, top: 20),
                       child: Text(
-                        'Nome do usuário',
+                        'Fulano',
                         style: TextStyle(
                           color: Color.fromRGBO(1, 28, 57, 1),
                           fontSize: 20,

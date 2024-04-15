@@ -5,7 +5,9 @@ import 'package:mobile/components/qrcode_overlay.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QRCode extends StatefulWidget {
-  const QRCode({super.key});
+  final PageController paginaController;
+
+  const QRCode({super.key, required this.paginaController});
 
   @override
   State<QRCode> createState() => _QRCodeState();
@@ -20,13 +22,13 @@ class _QRCodeState extends State<QRCode> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         extendBodyBehindAppBar: true,
-        backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
+        backgroundColor: Color.fromRGBO(1, 28, 57, 1),
         appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: Color.fromRGBO(255, 255, 255, 1),),
-          onPressed: () {
-            // TODO
-          },
+            icon: Icon(Icons.arrow_back_rounded, color: Color.fromRGBO(255, 255, 255, 1),),
+            onPressed: () {
+              widget.paginaController.jumpToPage(0);
+            },
           ),
         backgroundColor: Color.fromARGB(0, 0, 0, 0),
         elevation: 0,
@@ -38,7 +40,7 @@ class _QRCodeState extends State<QRCode> {
             onDetect: (barcodes) {
               },
             ),
-            QRcodeOverlay(overlayColour: Colors.black.withOpacity(0.5))
+            QRcodeOverlay(overlayColour: Colors.black.withOpacity(0.3))
           ]
         )
       ),

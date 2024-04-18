@@ -27,78 +27,92 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: AnnotatedRegion(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color.fromRGBO(233, 248, 255, 1),
-          statusBarIconBrightness: Brightness.dark,
-        ),
+        value: _statusBar(),
         child: Scaffold(
-            body: PageView(
-              controller: paginaController,
-              children: [
-                Agenda(),
-                QRCode(paginaController: paginaController),
-                Perfil(),
-              ],
-              onPageChanged: (pagina) {
-                setState(() {
-                  paginaAtual = pagina;
-                });
-              },
-            ),
-
-            // botao qr code 
+            body: _pageView(),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: Color.fromRGBO(220, 242, 252, 1),
-              shape: CircleBorder(),
-              onPressed: () {
-                paginaController.jumpToPage(1);
-              },
-              elevation: 1,
-              tooltip: 'Escaneie o QR Code',
-              child: Icon(Icons.qr_code_2_rounded, color: paginaAtual == 1 ? Color.fromRGBO(12, 98, 160, 1) : Colors.grey),
-            ),
-            bottomNavigationBar: BottomAppBar(
-              color: Color.fromRGBO(220, 242, 252, 1),
-              shape: CircularNotchedRectangle(),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget> [
-
-                  //botao agenda 
-                  InkResponse(
-                    onTap: () {
-                      paginaController.jumpToPage(0);
-                    },
-                    child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                      children:[
-                        Icon(Icons.event_note_rounded, color: paginaAtual == 0 ? Color.fromRGBO(12, 98, 160, 1) : Colors.grey),
-                        Text("Agenda")
-                      ],
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(right: 40)),
-
-                  // botao perfil
-                  InkResponse(
-                    onTap: () {
-                      paginaController.jumpToPage(2);
-                    },
-                    child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                      children:[
-                        Icon(Icons.person_rounded, color: paginaAtual == 2 ? Color.fromRGBO(12, 98, 160, 1) : Colors.grey),
-                        Text("Perfil")
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            backgroundColor: paginaAtual != 1 ? Color.fromRGBO(233, 248, 255, 1) : Color.fromRGBO(233, 248, 255, 1).withOpacity(0),
+            extendBody: true,
+            floatingActionButton: _floatingQrButton(),
+            bottomNavigationBar: _bottomNavBar(),
           ),
       ),
     );
+  }
+
+  FloatingActionButton _floatingQrButton() {
+    return FloatingActionButton(
+            backgroundColor: Color.fromRGBO(220, 242, 252, 1),
+            shape: CircleBorder(),
+            onPressed: () {
+              paginaController.jumpToPage(1);
+            },
+            elevation: 1,
+            tooltip: 'Escaneie o QR Code',
+            child: Icon(Icons.qr_code_2_rounded, color: paginaAtual == 1 ? Color.fromRGBO(12, 98, 160, 1) : Colors.grey),
+          );
+  }
+
+  BottomAppBar _bottomNavBar() {
+    return BottomAppBar(
+            color: Color.fromRGBO(220, 242, 252, 1),
+            shape: CircularNotchedRectangle(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget> [
+
+                //botao agenda 
+                InkResponse(
+                  onTap: () {
+                    paginaController.jumpToPage(0);
+                  },
+                  child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                    children:[
+                      Icon(Icons.event_note_rounded, color: paginaAtual == 0 ? Color.fromRGBO(12, 98, 160, 1) : Colors.grey),
+                      Text("Agenda")
+                    ],
+                  ),
+                ),
+                Padding(padding: EdgeInsets.only(right: 40)),
+
+                // botao perfil
+                InkResponse(
+                  onTap: () {
+                    paginaController.jumpToPage(2);
+                  },
+                  child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                    children:[
+                      Icon(Icons.person_rounded, color: paginaAtual == 2 ? Color.fromRGBO(12, 98, 160, 1) : Colors.grey),
+                      Text("Perfil")
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+  }
+
+  PageView _pageView() {
+    return PageView(
+            controller: paginaController,
+            children: [
+              Agenda(),
+              QRCode(paginaController: paginaController),
+              Perfil(),
+            ],
+            onPageChanged: (pagina) {
+              setState(() {
+                paginaAtual = pagina;
+              });
+            },
+          );
+  }
+
+  SystemUiOverlayStyle _statusBar() {
+    return SystemUiOverlayStyle(
+        statusBarColor: paginaAtual == 1 ? Colors.transparent : Color.fromRGBO(233, 248, 255, 1),
+        statusBarIconBrightness: paginaAtual == 1 ? Brightness.light : Brightness.dark,
+      );
   }
 }

@@ -97,7 +97,7 @@ class _HomeState extends State<Home> {
     return PageView(
             controller: paginaController,
             children: [
-              Agenda(),
+              Agenda(paginaController: paginaController),
               QRCode(paginaController: paginaController),
               Perfil(),
             ],

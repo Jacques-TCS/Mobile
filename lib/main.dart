@@ -13,10 +13,15 @@ import 'package:mobile/pages/servico.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ),
   );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const MyApp());
 }
 
@@ -32,7 +37,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/home': (context) => Home(),
-        '/agenda': (context) => Agenda(),
+        '/agenda': (context) => Agenda(paginaController: PageController()),
         '/perfil': (context) => Perfil(),
         '/qrcode': (context) => QRCode(paginaController: PageController()),
         '/servico': (context) => Servico(),

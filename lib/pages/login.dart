@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/models/usuario_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -16,17 +17,23 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  UsuarioModel usuario = UsuarioModel(username: '', password: '');
+  Usuario usuario = Usuario(username: '', password: '');
+  
 
   // ! TODO: alterar para o IP da máquina
 
-  String url = "http://192.168.0.106:8080/api/usuario/login";
+  String url = "http://10.10.101.33:8080/api/usuario/login";
 
   Future save() async {
     var res = await http.post(Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'username': usuario.username, 'password': usuario.password}));
     if (res.statusCode == 200) {
+      var body = json.decode(res.body);
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('usuario', body['usuario']);
+        prefs.setString('token', body['token']);
+        print(body['usuario']);
       Navigator.pushNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

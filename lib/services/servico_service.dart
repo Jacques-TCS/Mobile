@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class Service {
+class ServicoService {
   final String _baseUrl='localhost:8080/api/servico';
   Map<String, String> headers = {
     'Content-Type': 'application/json',

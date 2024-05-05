@@ -1,38 +1,46 @@
-class UsuarioModel {
+// ignore_for_file: avoid_init_to_null
+
+import 'package:mobile/models/cargo_model.dart';
+
+class Usuario {
   
   final int id;
   String nome, email, username, password;
+  Cargo? cargo;
 
-  UsuarioModel({
+  Usuario({
     this.id = 0,
     this.nome = '',
     this.email = '',
-    required this.username,
-    required this.password
+    this.username = '',
+    this.password = '',
+    this.cargo = null
   });
   
-  factory UsuarioModel.fromJson(Map<String, dynamic> json) {
-    return UsuarioModel(
+  factory Usuario.fromJson(Map<String, dynamic> json) {
+    return Usuario(
       id: json['id'],
       nome: json['nome'],
       email: json['email'],
       username: json['username'],
-      password: json['password']
+      password: json['password'],
+      cargo: Cargo.fromJson(json['cargo'])
     );
   }
 
-  Map<String, dynamic> toJson(UsuarioModel usuario) {
+  Map<String, dynamic> toJson(Usuario usuario) {
     return {
       'id': id,
       'nome': nome,
       'email': email,
       'username': username,
-      'password': password
+      'password': password,
+      'cargo': cargo!.toJson(cargo!)
     };
   }
 
   @override
   String toString() {
-    return 'UsuarioModel{id: $id, nome: $nome, email: $email, username: $username, password: $password}';
+    return 'Usuario{id: $id, nome: $nome, email: $email, username: $username, password: $password}, cargo: $cargo';
   }
 }

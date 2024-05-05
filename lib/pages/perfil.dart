@@ -1,6 +1,10 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Perfil extends StatefulWidget {
   const Perfil({super.key});
@@ -10,6 +14,22 @@ class Perfil extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil> {
+
+  String? nome;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  void _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nome = prefs.getString('usuario') ?? '';
+      nome = utf8.decode(nome!.codeUnits);
+    });
+  }
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -25,37 +45,26 @@ class _PerfilState extends State<Perfil> {
             body: Center(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(0, 0, 0, 0.25),
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                          spreadRadius: 0.1
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 100,
-                      backgroundColor: Color.fromRGBO(123, 210, 246, 1),
-                      child: Icon(
-                        Icons.person_rounded,
-                        size: 120,
-                        color: Color.fromRGBO(1, 28, 57, 1),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: ProfilePicture(
+                        name: '$nome',
+                        radius: 80,
+                        fontsize: 40,
+                        count: 2,
+                        
                     ),
                   ),
                   SizedBox(
                     child: Padding(
                       padding: const EdgeInsets.only(
-                          right: 16, left: 16, bottom: 60, top: 20),
+                          right: 16, left: 16, bottom: 40, top: 20),
                       child: Text(
-                        'Fulano',
+                        '$nome',
                         style: TextStyle(
                           color: Color.fromRGBO(1, 28, 57, 1),
-                          fontSize: 20,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold
                         ),
                       ),
                     ),

@@ -1,6 +1,11 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_field
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile/models/servico_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Agenda extends StatefulWidget {
   const Agenda({super.key, required this.paginaController});
@@ -23,6 +28,44 @@ class _AgendaState extends State<Agenda> {
     });
   }
 
+  String? nome;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  void _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nome = prefs.getString('usuario') ?? '';
+      nome = utf8.decode(nome!.codeUnits);
+    });
+  }
+
+  final String _baseUrl='localhost:8080/api/servico/todos';
+  Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+
+  Future<List> getServicos() async {
+  try {
+    Uri uri = Uri.parse(_baseUrl);
+    http.Response response = await http.get(uri, headers: headers);
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List servicos = body.map((dynamic item) => Servico.fromJson(item)).toList();
+      return servicos;
+    } else {
+      throw Exception('Failed to load Servicos');
+    }
+  } catch (e) {
+    throw Exception('Failed to load Servicos');
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +81,7 @@ class _AgendaState extends State<Agenda> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'Bem-vindo, Fulano(a)',
+              'Bem-vindo(a), $nome',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: const Color.fromRGBO(1, 28, 57, 1),
@@ -54,8 +97,8 @@ class _AgendaState extends State<Agenda> {
               _togglePanel(index);
             },
             children: [
-              servicosAbertos(context),
-              servicosConcluidos(context),
+              _servicosAbertos(context),
+              _servicosConcluidos(context),
             ],
           ),
         ],
@@ -63,7 +106,7 @@ class _AgendaState extends State<Agenda> {
     );
   }
 
-  ExpansionPanel servicosAbertos(BuildContext context) {
+  ExpansionPanel _servicosAbertos(BuildContext context) {
     return ExpansionPanel(
               backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
               canTapOnHeader: true,
@@ -147,7 +190,7 @@ class _AgendaState extends State<Agenda> {
             );
   }
 
-  ExpansionPanel servicosConcluidos(BuildContext context) {
+  ExpansionPanel _servicosConcluidos(BuildContext context) {
     return ExpansionPanel(
               backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
               headerBuilder: (BuildContext context, bool isExpanded) {

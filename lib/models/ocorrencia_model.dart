@@ -1,5 +1,5 @@
 
-import 'package:mobile/pages/servico.dart';
+import 'package:mobile/models/servico_model.dart';
 import 'categoria_de_ocorrencia_model.dart';
 
 class Ocorrencia {

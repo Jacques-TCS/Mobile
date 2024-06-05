@@ -20,7 +20,7 @@ class SetorTemAtividade {
     );
   }
 
-  Map<String, dynamic> toJson(SetorTemAtividade SetorTemAtividade) {
+  Map<String, dynamic> toJson(SetorTemAtividade setorTemAtividade) {
     return {
       'id': id,
       'servico': servico.toJson(servico),

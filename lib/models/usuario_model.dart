@@ -5,16 +5,16 @@ import 'package:mobile/models/cargo_model.dart';
 class Usuario {
   
   final int id;
-  String nome, email, username, password;
+  String? nome, email, username, password;
   Cargo? cargo;
 
   Usuario({
     this.id = 0,
-    this.nome = '',
-    this.email = '',
-    this.username = '',
-    this.password = '',
-    this.cargo = null
+    this.nome,
+    this.email,
+    this.username,
+    this.password,
+    this.cargo
   });
   
   factory Usuario.fromJson(Map<String, dynamic> json) {

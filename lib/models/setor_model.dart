@@ -1,4 +1,3 @@
-import 'setor_tem_atividade_model.dart';
 import 'tipo_de_ambiente_model.dart';
 
 class Setor {
@@ -6,7 +5,6 @@ class Setor {
   final String nome, sigla;
   final bool internacao;
   final TipoDeAmbiente tipoDeAmbiente;
-  final List<SetorTemAtividade> atividades;
 
   Setor({
     this.id = 0,
@@ -14,7 +12,6 @@ class Setor {
     required this.sigla,
     required this.internacao,
     required this.tipoDeAmbiente,
-    required this.atividades
   });
 
   factory Setor.fromJson(Map<String, dynamic> json) {
@@ -24,7 +21,6 @@ class Setor {
       sigla: json['sigla'],
       internacao: json['internacao'],
       tipoDeAmbiente: TipoDeAmbiente.fromJson(json['tipoDeAmbiente']),
-      atividades: (json['atividades'] as List).map((atividade) => SetorTemAtividade.fromJson(atividade)).toList()
     );
   }
 
@@ -35,12 +31,11 @@ class Setor {
       'sigla': sigla,
       'internacao': internacao,
       'tipoDeAmbiente': tipoDeAmbiente.toJson(tipoDeAmbiente),
-      'atividades': atividades.map((atividade) => atividade.toJson(atividade)).toList()
     };
   }
 
   @override
   String toString() {
-    return 'Setor{id: $id, nome: $nome, sigla: $sigla, internacao: $internacao, tipoDeAmbiente: $tipoDeAmbiente, atividades: $atividades}';
+    return 'Setor{id: $id, nome: $nome, sigla: $sigla, internacao: $internacao, tipoDeAmbiente: $tipoDeAmbiente}';
   }
 }

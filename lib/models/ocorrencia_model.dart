@@ -4,19 +4,19 @@ import 'categoria_de_ocorrencia_model.dart';
 
 class Ocorrencia {
   final int id;
-  final String descricao;
-  final bool status;
-  final DateTime dataOcorrencia;
-  final Servico servico;
-  final CategoriaDeOcorrencia categoriaDeOcorrencia;
+  String? descricao;
+  bool? status;
+  DateTime? dataOcorrencia;
+  Servico? servico;
+  CategoriaDeOcorrencia? categoriaDeOcorrencia;
 
   Ocorrencia({
     this.id = 0,
-    required this.descricao,
-    required this.status,
-    required this.dataOcorrencia,
-    required this.servico,
-    required this.categoriaDeOcorrencia
+    this.descricao,
+    this.status,
+    this.dataOcorrencia,
+    this.servico,
+    this.categoriaDeOcorrencia
   });
 
   factory Ocorrencia.fromJson(Map<String, dynamic> json) {
@@ -36,8 +36,8 @@ class Ocorrencia {
       'descricao': descricao,
       'status': status,
       'dataOcorrencia': dataOcorrencia.toString(),
-      'servico': servico.toJson(servico),
-      'categoriaDeOcorrencia': categoriaDeOcorrencia.toJson(categoriaDeOcorrencia)
+      'servico': servico?.toJson(servico!),
+      'categoriaDeOcorrencia': categoriaDeOcorrencia?.toJson(categoriaDeOcorrencia!)
     };
   }
 

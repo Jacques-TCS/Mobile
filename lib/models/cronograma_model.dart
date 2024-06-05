@@ -2,13 +2,13 @@ import 'package:mobile/models/tipo_de_limpeza_model.dart';
 
 class Cronograma {
   final int id;
-  final int mes;
-  final TipoDeLimpeza tipoDeLimpeza;
+  int? mes;
+  TipoDeLimpeza? tipoDeLimpeza;
 
   Cronograma({
     this.id = 0,
-    required this.mes,
-    required this.tipoDeLimpeza
+    this.mes,
+    this.tipoDeLimpeza
   });
 
   factory Cronograma.fromJson(Map<String, dynamic> json) {
@@ -23,7 +23,7 @@ class Cronograma {
     return {
       'id': id,
       'mes': mes,
-      'tipoDeLimpeza': tipoDeLimpeza.toJson(tipoDeLimpeza)
+      'tipoDeLimpeza': tipoDeLimpeza?.toJson(tipoDeLimpeza!)
     };
   }
 

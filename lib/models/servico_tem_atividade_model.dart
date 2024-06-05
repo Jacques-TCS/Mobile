@@ -3,13 +3,13 @@ import 'servico_model.dart';
 
 class ServicoTemAtividade {
   final int id;
-  final Servico servico;
-  final Atividade atividade;
+  Servico? servico;
+  Atividade? atividade;
 
   ServicoTemAtividade({
     this.id = 0,
-    required this.servico,
-    required this.atividade
+    this.servico,
+    this.atividade
   });
 
   factory ServicoTemAtividade.fromJson(Map<String, dynamic> json) {
@@ -23,8 +23,8 @@ class ServicoTemAtividade {
   Map<String, dynamic> toJson(ServicoTemAtividade servicoTemAtividade) {
     return {
       'id': id,
-      'servico': servico.toJson(servico),
-      'atividade': atividade.toJson(atividade)
+      'servico': servico?.toJson(servico!),
+      'atividade': atividade?.toJson(atividade!)
     };
   }
 

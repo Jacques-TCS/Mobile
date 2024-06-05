@@ -22,7 +22,8 @@ class _LoginState extends State<Login> {
 
   // ! TODO: alterar para o IP da máquina
 
-  String url = "http://10.10.101.33:8080/api/usuario/login";
+  // String url = "http://192.168.0.106:8080/api/usuario/login";
+  String url = "http://10.10.101.230:8080/api/usuario/login";
 
   Future save() async {
     var res = await http.post(Uri.parse(url),
@@ -31,9 +32,8 @@ class _LoginState extends State<Login> {
     if (res.statusCode == 200) {
       var body = json.decode(res.body);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('usuario', body['usuario']);
+        prefs.setString('usuario', body['username']);
         prefs.setString('token', body['token']);
-        print(body['usuario']);
       Navigator.pushNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

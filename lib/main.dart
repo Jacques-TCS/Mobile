@@ -9,7 +9,7 @@ import 'package:mobile/pages/perfil.dart';
 import 'package:mobile/components/qrcode.dart';
 import 'package:mobile/pages/resetar_senha_login.dart';
 import 'package:mobile/pages/resetar_senha_perfil.dart';
-import 'package:mobile/pages/servico.dart';
+import 'package:mobile/pages/registro_servico.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +28,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,7 +39,7 @@ class MyApp extends StatelessWidget {
         '/agenda': (context) => Agenda(paginaController: PageController()),
         '/perfil': (context) => Perfil(),
         '/qrcode': (context) => QRCode(paginaController: PageController()),
-        '/servico': (context) => Servico(),
+        // '/servico': (context) => RegistroServico(servicoId: int,),
         '/resetar_senha_login': (context) => ResetarSenhaLogin(),
         '/resetar_senha_perfil': (context) => ResetarSenhaPerfil(),
       },

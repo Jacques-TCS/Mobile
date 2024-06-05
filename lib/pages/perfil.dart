@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -16,6 +16,7 @@ class Perfil extends StatefulWidget {
 class _PerfilState extends State<Perfil> {
 
   String? nome;
+  late String token;
 
   @override
   void initState() {
@@ -23,13 +24,20 @@ class _PerfilState extends State<Perfil> {
     _loadPreferences();
   }
 
-  void _loadPreferences() async {
+    Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       nome = prefs.getString('usuario') ?? '';
-      nome = utf8.decode(nome!.codeUnits);
+      if (nome!.isNotEmpty) {
+        nome = utf8.decode(nome!.codeUnits);
+      }
+      token = prefs.getString('token') ?? '';
+      if (token.isEmpty) {
+        throw Exception('Token é nulo ou vazio');
+      }
     });
   }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -37,19 +45,19 @@ class _PerfilState extends State<Perfil> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
-            appBar: AppBar(
-              backgroundColor: Color.fromRGBO(233, 248, 255, 1),
-              title: const Text('Perfil'),
-              automaticallyImplyLeading: false,
-            ),
+            // appBar: AppBar(
+            //   backgroundColor: Color.fromRGBO(233, 248, 255, 1),
+            //   title: const Text('Perfil'),
+            //   automaticallyImplyLeading: false,
+            // ),
             body: Center(
               child: Column(
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
+                    padding: const EdgeInsets.only(top: 32.0),
                     child: ProfilePicture(
                         name: '$nome',
-                        radius: 80,
+                        radius: 60,
                         fontsize: 40,
                         count: 2,
                         
@@ -78,7 +86,7 @@ class _PerfilState extends State<Perfil> {
                         style: TextStyle(
                           color: Color.fromRGBO(1, 28, 57, 1),
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -123,7 +131,7 @@ class _PerfilState extends State<Perfil> {
                         style: TextStyle(
                           color: Color.fromRGBO(1, 28, 57, 1),
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -131,7 +139,9 @@ class _PerfilState extends State<Perfil> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 80),
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.remove('token');
                         Navigator.pop(context);
                       },
                       child: Row(

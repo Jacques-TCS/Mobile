@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_field
+// ignore_for_file: prefer_const_constructors, avoid_print, body_might_complete_normally_catch_error
 
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/models/servico_model.dart';
+import 'package:mobile/services/servico_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Agenda extends StatefulWidget {
@@ -17,76 +18,108 @@ class Agenda extends StatefulWidget {
 
 class _AgendaState extends State<Agenda> {
   int _expandedIndex = 0;
-
-  void _togglePanel(int index) {
-    setState(() {
-      if (_expandedIndex == index) {
-        _expandedIndex = -1;
-      } else {
-        _expandedIndex = index;
-      }
-    });
-  }
-
   String? nome;
+  late String token;
+  Future<List<Servico>>? _allServicos;
+  Future<List<Servico>>? _servicosAbertosHoje;
 
   @override
   void initState() {
     super.initState();
-    _loadPreferences();
-  }
-
-  void _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      nome = prefs.getString('usuario') ?? '';
-      nome = utf8.decode(nome!.codeUnits);
+    _loadPreferences().then((_) {
+      _allServicos = getServicos(filterByDataHora: false);
+      _servicosAbertosHoje = _allServicos?.then((servicos) => servicos
+          .where((s) => s.dataHoraInicio == null && s.dataHoraFim == null)
+          .toList());
+    }).catchError((error) {
+      print('Erro ao buscar serviços: $error');
     });
   }
 
-  final String _baseUrl='localhost:8080/api/servico/todos';
-  Map<String, String> headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
-
-  Future<List> getServicos() async {
-  try {
-    Uri uri = Uri.parse(_baseUrl);
-    http.Response response = await http.get(uri, headers: headers);
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List servicos = body.map((dynamic item) => Servico.fromJson(item)).toList();
-      return servicos;
-    } else {
-      throw Exception('Failed to load Servicos');
+  void _togglePanel(int index) {
+    if (mounted) {
+      setState(() {
+        _expandedIndex = (_expandedIndex == index) ? -1 : index;
+      });
     }
-  } catch (e) {
-    throw Exception('Failed to load Servicos');
   }
-}
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nome = prefs.getString('usuario') ?? '';
+      if (nome!.isNotEmpty) {
+        nome = utf8.decode(nome!.codeUnits);
+      }
+      token = prefs.getString('token') ?? '';
+      if (token.isEmpty) {
+        throw Exception('Token é nulo ou vazio');
+      }
+      print('Token loaded: $token');
+    });
+  }
+
+  Map<String, String> get headers {
+    return {
+      'Authorization': 'Bearer $token',
+    };
+  }
+
+  Future<List<Servico>> getServicos({bool filterByDataHora = false}) async {
+    try {
+      await _loadPreferences();
+      ServicoService servicoService = ServicoService();
+      Map<String, String> params = {};
+      Map<String, String> requestHeaders = {
+        'Authorization': 'Bearer $token',
+        ...servicoService.headers,
+      };
+      print('Headers: $requestHeaders');
+
+      http.Response response =
+          await servicoService.get('/servicos-dia', params, requestHeaders);
+      if (response.statusCode == 200) {
+        List<Servico> servicos = (jsonDecode(response.body) as List)
+            .map((item) => Servico.fromJson(item))
+            .toList();
+
+        if (filterByDataHora) {
+          servicos = servicos
+              .where((servico) =>
+                  servico.dataHoraInicio == null && servico.dataHoraFim == null)
+              .toList();
+        }
+
+        return servicos;
+      } else {
+        throw Exception(
+            'Falha ao carregar os serviços. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao buscar serviços: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
-        title: const Text('Agenda'),
-        automaticallyImplyLeading: false,
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
+      //   automaticallyImplyLeading: false,
+      // ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 32.0),
             child: Text(
               'Bem-vindo(a), $nome',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: const Color.fromRGBO(1, 28, 57, 1),
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
+                fontSize: 26,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -108,149 +141,269 @@ class _AgendaState extends State<Agenda> {
 
   ExpansionPanel _servicosAbertos(BuildContext context) {
     return ExpansionPanel(
-              backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
-              canTapOnHeader: true,
-              headerBuilder: (BuildContext context, bool isExpanded) {
-                return Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      _togglePanel(0);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'TAREFAS DO DIA',
-                        style: TextStyle(
-                          color: const Color.fromRGBO(1, 28, 57, 1),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+      backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
+      headerBuilder: (BuildContext context, bool isExpanded) {
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              _togglePanel(0);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'SERVIÇOS DO DIA',
+                style: TextStyle(
+                  color: const Color.fromRGBO(1, 28, 57, 1),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.5,
+        child: FutureBuilder<List<Servico>?>(
+          future: _servicosAbertosHoje,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                _servicosAbertosHoje == null) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Erro: ${snapshot.error}'));
+            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Servico servico = snapshot.data![index];
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        AlertDialog alert = AlertDialog(
+                          title: Text('${servico.ambiente.descricao}',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: SizedBox(
+                            height: 200,
+                            width: 300,
+                            child: Column(
+                              children: <Widget>[
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: <Widget>[
+                                        Text(
+                                            servico.tipoDeLimpeza.tipoDeLimpeza,
+                                            style: TextStyle(
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w500)),
+                                        SizedBox(height: 10),
+                                        Text('Lista de atividades:',
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500)),
+                                        SizedBox(height: 10),
+                                        Text(
+                                            '  - ${servico.atividades.map((atividade) => atividade.descricao).join('\n  - ')}',
+                                            style: TextStyle(fontSize: 15)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Text('Deseja iniciar o serviço?',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                          actions: <Widget>[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Cancel'),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Color.fromRGBO(
+                                          12, 98, 160, 1), // text color
+                                    ),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      widget.paginaController.jumpToPage(1);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Color.fromRGBO(
+                                          12, 98, 160, 1), // text color
+                                    ),
+                                    child: const Text('Ler QR Code'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Theme(
+                                data: Theme.of(context).copyWith(
+                                    dialogBackgroundColor:
+                                        Color.fromRGBO(220, 242, 252, 1)),
+                                child: alert);
+                          },
+                        );
+                      },
+                      child: Card(
+                        color: Colors.white,
+                        surfaceTintColor: Colors.transparent,
+                        elevation: 2,
+                        child: ListTile(
+                          title: Text('${servico.ambiente.descricao}',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text(servico.tipoDeLimpeza.tipoDeLimpeza),
+                          trailing: const Icon(Icons.add_circle_rounded,
+                              color: Color.fromRGBO(12, 98, 160, 1)),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-              body: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: 12,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          AlertDialog alert = AlertDialog(
-                            title: Text('Serviço ${index + 1}'),
-                            content: Text('Limpeza Terminal: \n\n'
-                                'Lista de Atividades: \n\n'
-                                '1. Atividade 1\n'
-                                '2. Atividade 2\n'
-                                '3. Atividade 3\n\n'
-                                'Deseja iniciar o serviço?'
-                                ),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Cancel'),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  widget.paginaController.jumpToPage(1);
-                                },
-                                child: const Text('Escanear QR Code'),
-                              ),
-                            ],
-                          );
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return alert;
-                            },
-                          );
-                        },
-                        child: Card(
-                          child: ListTile(
-                            title: Text('Agendamento ${index + 1}'),
-                            subtitle:
-                                Text('Descrição do agendamento ${index + 1}'),
-                            trailing:
-                                const Icon(Icons.arrow_drop_down_rounded),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              isExpanded: _expandedIndex == 0,
-            );
+                  );
+                },
+              );
+            } else {
+              return Center(child: Text("Nenhum serviço encontrado."));
+            }
+          },
+        ),
+      ),
+      isExpanded: _expandedIndex == 0,
+    );
   }
 
   ExpansionPanel _servicosConcluidos(BuildContext context) {
     return ExpansionPanel(
-              backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
-              headerBuilder: (BuildContext context, bool isExpanded) {
-                return Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      _togglePanel(1);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'TAREFAS CONCLUÍDAS',
-                        style: TextStyle(
-                          color: const Color.fromRGBO(1, 28, 57, 1),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-              body: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: ListView.builder(
+      backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
+      headerBuilder: (BuildContext context, bool isExpanded) {
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              _togglePanel(1);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'SERVIÇOS CONCLUÍDOS',
+                style: TextStyle(
+                  color: const Color.fromRGBO(1, 28, 57, 1),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.5,
+        child: FutureBuilder<List<Servico>>(
+          future: _allServicos?.then((servicos) => servicos
+              .where((s) => s.dataHoraInicio != null && s.dataHoraFim != null)
+              .toList()),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<Servico>> snapshot) {
+            if (snapshot.hasData) {
+              List<Servico> servicos = snapshot.data!
+                  .where((servico) => servico.dataHoraFim != null)
+                  .toList();
+              if (servicos.isEmpty) {
+                return Center(child: Text('Nenhum serviço concluído'));
+              } else {
+                return ListView.builder(
                   shrinkWrap: true,
-                  itemCount: 20,
+                  itemCount: servicos.length,
                   itemBuilder: (BuildContext context, int index) {
+                    Servico servico = servicos[index];
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: GestureDetector(
                         onTap: () {
                           AlertDialog alert = AlertDialog(
-                            title: Text('Serviço Realizado - ${index + 1}'),
-                            content: Text('Limpeza Terminal: \n\n'
-                                'Lista de Atividades: \n\n'
-                                '1. Atividade 1\n'
-                                '2. Atividade 2\n'
-                                '3. Atividade 3'),
+                            title: Text('${servico.ambiente.descricao}',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            content: SizedBox(
+                              height: 200,
+                              width: 300,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: <Widget>[
+                                    Text(servico.tipoDeLimpeza.tipoDeLimpeza,
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w500)),
+                                    SizedBox(height: 20),
+                                    Text('Lista de atividades:',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500)),
+                                    SizedBox(height: 10),
+                                    Text(
+                                        '  - ${servico.atividades.map((atividade) => atividade.descricao).join('\n  - ')}',
+                                        style: TextStyle(fontSize: 15)),
+                                  ],
+                                ),
+                              ),
+                            ),
                             actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, 'Sair'),
-                                child: const Text('Sair'),
+                              SizedBox(
+                                width: 160,
+                                child: TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Sair'),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Color.fromRGBO(
+                                        12, 98, 160, 1), // text color
+                                  ),
+                                  child: const Text('Sair'),
+                                ),
                               ),
                             ],
                           );
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return alert;
+                              return Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor:
+                                          Color.fromRGBO(220, 242, 252, 1)),
+                                  child: alert);
                             },
                           );
                         },
                         child: Card(
+                          color: Colors.white,
+                          surfaceTintColor: Colors.transparent,
+                          elevation: 2,
                           child: ListTile(
-                            title: Text('Agendamento ${index + 1}'),
-                            subtitle:
-                                Text('Descrição do agendamento ${index + 1}'),
+                            title: Text('${servico.ambiente.descricao}',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(servico.tipoDeLimpeza.tipoDeLimpeza),
                             trailing: const Icon(Icons.check_circle,
                                 color: Colors.green),
                           ),
@@ -258,9 +411,17 @@ class _AgendaState extends State<Agenda> {
                       ),
                     );
                   },
-                ),
-              ),
-              isExpanded: _expandedIndex == 1,
-            );
+                );
+              }
+            } else if (snapshot.hasError) {
+              return Text('Erro: ${snapshot.error}');
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
+        ),
+      ),
+      isExpanded: _expandedIndex == 1,
+    );
   }
 }

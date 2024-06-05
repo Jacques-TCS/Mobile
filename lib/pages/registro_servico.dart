@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 
-class Servico extends StatefulWidget {
-  const Servico({super.key});
+class RegistroServico extends StatefulWidget {
+  const RegistroServico({super.key, required int servicoId});
 
   @override
-  State<Servico> createState() => _ServicoState();
+  State<RegistroServico> createState() => _RegistroServicoState();
 }
 
-class _ServicoState extends State<Servico> {
+class _RegistroServicoState extends State<RegistroServico> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

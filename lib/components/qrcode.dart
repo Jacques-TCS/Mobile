@@ -1,7 +1,6 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_element, avoid_print
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/components/qrcode_overlay.dart';
@@ -23,7 +22,9 @@ class QRCode extends StatefulWidget {
 class _QRCodeState extends State<QRCode> {
   String? nome;
   late String token;
-  Future<List<Servico>>? _allServicos;
+  final MobileScannerController scannerController = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+  );
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,7 +37,6 @@ class _QRCodeState extends State<QRCode> {
       if (token.isEmpty) {
         throw Exception('Token é nulo ou vazio');
       }
-      print('Token loaded: $token');
     });
   }
 
@@ -46,7 +46,8 @@ class _QRCodeState extends State<QRCode> {
     };
   }
 
-  Future<List<Servico>> getServicos({bool filterByDataHora = false}) async {
+  Future<List<Servico>> getServicos(String id,
+      {bool filterByDataHora = false}) async {
     try {
       await _loadPreferences();
       ServicoService servicoService = ServicoService();
@@ -55,10 +56,8 @@ class _QRCodeState extends State<QRCode> {
         'Authorization': 'Bearer $token',
         ...servicoService.headers,
       };
-      print('Headers: $requestHeaders');
-
-      http.Response response =
-          await servicoService.get('/servicos-dia', params, requestHeaders);
+      http.Response response = await servicoService.get(
+          '/servicos-dia-ambiente/$id', params, requestHeaders);
       if (response.statusCode == 200) {
         List<Servico> servicos = (jsonDecode(response.body) as List)
             .map((item) => Servico.fromJson(item))
@@ -79,6 +78,11 @@ class _QRCodeState extends State<QRCode> {
     } catch (e) {
       throw Exception('Erro ao buscar serviços: $e');
     }
+  }
+
+  void _resetScanner() {
+    scannerController.stop();
+    scannerController.start();
   }
 
   @override
@@ -103,72 +107,124 @@ class _QRCodeState extends State<QRCode> {
           ),
           body: Stack(children: [
             MobileScanner(
-              controller: MobileScannerController(
-                detectionSpeed: DetectionSpeed.noDuplicates,
-              ),
-              onDetect: (capture) {
+              controller: scannerController,
+              onDetect: (capture) async {
                 final List<Barcode> barcodes = capture.barcodes;
                 for (final barcode in barcodes) {
-                  debugPrint('Barcode found! ${barcode.rawValue}');
-                  _allServicos?.then((servico) {
-                    final servicosInAmbiente = servico
-                        .where(
-                            (s) => s.ambiente.id.toString() == barcode.rawValue)
-                        .toList();
-                    if (servicosInAmbiente.isNotEmpty) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Choose a servico'),
-                            content: ListView.builder(
-                              itemCount: servicosInAmbiente.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ListTile(
-                                  title: Text(
-                                      servicosInAmbiente[index].toString()),
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => RegistroServico(
-                                          servicoId:
-                                              servicosInAmbiente[index].id,
+                  ('Barcode found! ${barcode.rawValue}');
+                  final id = barcode.rawValue?.split(':').last.trim();
+                  (id);
+
+                  if (id != null) {
+                    try {
+                      List<Servico> servicos = await getServicos(id, filterByDataHora: true);
+                      final servicosNoAmbiente = servicos
+                          .where((s) => s.ambiente.id.toString() == id)
+                          .toList();
+                      ('Servicos in ambiente: $servicosNoAmbiente');
+
+                      if (servicosNoAmbiente.isNotEmpty) {
+                        ('Showing dialog...');
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title:
+                                  Text('Escolha o serviço que deseja iniciar:'),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: servicosNoAmbiente.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    ('Building list item $index');
+                                    return ListTile(
+                                      title: Container(
+                                        alignment: Alignment.center,
+                                        child: SizedBox(
+                                          width: 400,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      RegistroServico(
+                                                    servicoId:
+                                                        servicosNoAmbiente[index]
+                                                            .id,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.white,
+                                              backgroundColor: Color.fromRGBO(
+                                                  12, 98, 160, 1), // button color
+                                            ),
+                                            child: Text(servicosNoAmbiente[index]
+                                                .tipoDeLimpeza
+                                                .tipoDeLimpeza),
+                                          ),
                                         ),
                                       ),
                                     );
                                   },
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Alerta'),
-                            content:
-                                Text('Você não possui serviço neste ambiente!'),
-                            actions: <Widget>[
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Color.fromRGBO(
-                                        12, 98, 160, 1), // button color
-                                  ),
-                                  child: const Text('Cancelar'),
                                 ),
                               ),
-                            ],
-                          );
-                        },
-                      );
+                              actions: <Widget>[
+                                SizedBox(
+                                  width: 100,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'Sair');
+                                      _resetScanner();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Color.fromRGBO(
+                                          12, 98, 160, 1), // button color
+                                    ),
+                                    child: const Text('Sair'),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Alerta'),
+                              content: Text(
+                                  'Você não possui serviço neste ambiente!'),
+                              actions: <Widget>[
+                                SizedBox(
+                                  width: 100,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, 'Sair');
+                                      _resetScanner();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Color.fromRGBO(
+                                          12, 98, 160, 1), // text color
+                                    ),
+                                    child: const Text('Sair'),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    } catch (e) {
+                      throw Exception('Erro ao buscar serviços: $e');
                     }
-                  });
+                  } 
                 }
               },
             ),

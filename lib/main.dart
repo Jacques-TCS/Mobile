@@ -39,9 +39,19 @@ class MyApp extends StatelessWidget {
         '/agenda': (context) => Agenda(paginaController: PageController()),
         '/perfil': (context) => Perfil(),
         '/qrcode': (context) => QRCode(paginaController: PageController()),
-        // '/servico': (context) => RegistroServico(servicoId: int,),
         '/resetar_senha_login': (context) => ResetarSenhaLogin(),
         '/resetar_senha_perfil': (context) => ResetarSenhaPerfil(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/servico') {
+          final int servicoId = settings.arguments as int;
+          return MaterialPageRoute(
+            builder: (context) {
+              return RegistroServico(servicoId: servicoId);
+            },
+          );
+        }
+        return null;
       },
     );
   }

@@ -3,21 +3,22 @@
 import 'package:flutter/material.dart';
 
 class RegistroServico extends StatefulWidget {
-  const RegistroServico({super.key, required int servicoId});
+  final int servicoId;
+
+  const RegistroServico({super.key, required this.servicoId});
 
   @override
   State<RegistroServico> createState() => _RegistroServicoState();
 }
 
 class _RegistroServicoState extends State<RegistroServico> {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    int servicoId = widget.servicoId; 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        // bottomNavigationBar: MenuInferior(currentIndex: widget.currentIndex),
-        body: Text('Serviço'),
+        body: Text('Serviço: $servicoId'),
       ),
     );
   }

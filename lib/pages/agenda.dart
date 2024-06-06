@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, body_might_complete_normally_catch_error
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -163,131 +164,135 @@ class _AgendaState extends State<Agenda> {
           ),
         );
       },
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.5,
-        child: FutureBuilder<List<Servico>?>(
-          future: _servicosAbertosHoje,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting ||
-                _servicosAbertosHoje == null) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Erro: ${snapshot.error}'));
-            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  Servico servico = snapshot.data![index];
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        AlertDialog alert = AlertDialog(
-                          title: Text('${servico.ambiente.descricao}',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: SizedBox(
-                            height: 200,
-                            width: 300,
-                            child: Column(
-                              children: <Widget>[
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: <Widget>[
-                                        Text(
-                                            servico.tipoDeLimpeza.tipoDeLimpeza,
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w500)),
-                                        SizedBox(height: 10),
-                                        Text('Lista de atividades:',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500)),
-                                        SizedBox(height: 10),
-                                        Text(
-                                            '  - ${servico.atividades.map((atividade) => atividade.descricao).join('\n  - ')}',
-                                            style: TextStyle(fontSize: 15)),
-                                      ],
+      body: FutureBuilder<List<Servico>?>(
+        future: _servicosAbertosHoje,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              _servicosAbertosHoje == null) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            double containerHeight = snapshot.data!.length *
+                100.0; // Adjust the multiplier as needed
+            double sizedBoxHeight = MediaQuery.of(context).size.height * 0.5;
+            double finalHeight = min(containerHeight, sizedBoxHeight);
+            return SizedBox(
+                height: finalHeight,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    Servico servico = snapshot.data![index];
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          AlertDialog alert = AlertDialog(
+                            title: Text('${servico.ambiente.descricao}',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            content: SizedBox(
+                              height: 200,
+                              width: 300,
+                              child: Column(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          Text(
+                                              servico
+                                                  .tipoDeLimpeza.tipoDeLimpeza,
+                                              style: TextStyle(
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w500)),
+                                          SizedBox(height: 10),
+                                          Text('Lista de atividades:',
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500)),
+                                          SizedBox(height: 10),
+                                          Text(
+                                              '  - ${servico.atividades.map((atividade) => atividade.descricao).join('\n  - ')}',
+                                              style: TextStyle(fontSize: 15)),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text('Deseja iniciar o serviço?',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold)),
-                              ],
+                                  Text('Deseja iniciar o serviço?',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
                             ),
+                            actions: <Widget>[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, 'Cancel'),
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: Color.fromRGBO(
+                                            12, 98, 160, 1), // text color
+                                      ),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        widget.paginaController.jumpToPage(1);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: Color.fromRGBO(
+                                            12, 98, 160, 1), // text color
+                                      ),
+                                      child: const Text('Ler QR Code'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor:
+                                          Color.fromRGBO(220, 242, 252, 1)),
+                                  child: alert);
+                            },
+                          );
+                        },
+                        child: Card(
+                          color: Colors.white,
+                          surfaceTintColor: Colors.transparent,
+                          elevation: 2,
+                          child: ListTile(
+                            title: Text('${servico.ambiente.descricao}',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(servico.tipoDeLimpeza.tipoDeLimpeza),
+                            trailing: const Icon(Icons.add_circle_rounded,
+                                color: Color.fromRGBO(12, 98, 160, 1)),
                           ),
-                          actions: <Widget>[
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'Cancel'),
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor: Color.fromRGBO(
-                                          12, 98, 160, 1), // text color
-                                    ),
-                                    child: const Text('Cancelar'),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      widget.paginaController.jumpToPage(1);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor: Color.fromRGBO(
-                                          12, 98, 160, 1), // text color
-                                    ),
-                                    child: const Text('Ler QR Code'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        );
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Theme(
-                                data: Theme.of(context).copyWith(
-                                    dialogBackgroundColor:
-                                        Color.fromRGBO(220, 242, 252, 1)),
-                                child: alert);
-                          },
-                        );
-                      },
-                      child: Card(
-                        color: Colors.white,
-                        surfaceTintColor: Colors.transparent,
-                        elevation: 2,
-                        child: ListTile(
-                          title: Text('${servico.ambiente.descricao}',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(servico.tipoDeLimpeza.tipoDeLimpeza),
-                          trailing: const Icon(Icons.add_circle_rounded,
-                              color: Color.fromRGBO(12, 98, 160, 1)),
                         ),
                       ),
-                    ),
-                  );
-                },
-              );
-            } else {
-              return Center(child: Text("Nenhum serviço encontrado."));
-            }
-          },
-        ),
+                    );
+                  },
+                ));
+          } else {
+            return Center(child: Text("Nenhum serviço encontrado."));
+          }
+        },
       ),
       isExpanded: _expandedIndex == 0,
     );

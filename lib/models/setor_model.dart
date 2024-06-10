@@ -2,7 +2,8 @@ import 'tipo_de_ambiente_model.dart';
 
 class Setor {
   final int id;
-  final String nome, sigla;
+  final String nome;
+  final String sigla;
   final bool internacao;
   final TipoDeAmbiente tipoDeAmbiente;
 
@@ -30,7 +31,7 @@ class Setor {
       'nome': nome,
       'sigla': sigla,
       'internacao': internacao,
-      'tipoDeAmbiente': tipoDeAmbiente.toJson(tipoDeAmbiente),
+      'tipoDeAmbiente': tipoDeAmbiente.toJson(),
     };
   }
 

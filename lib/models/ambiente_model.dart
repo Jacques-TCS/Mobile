@@ -18,8 +18,8 @@ class Ambiente {
     return Ambiente(
       id: json['id'],
       descricao: json['descricao'],
-      setor: Setor.fromJson(json['setor']),
-      tipoDeAmbiente: TipoDeAmbiente.fromJson(json['tipoDeAmbiente']),
+      setor: json['setor'] != null ? Setor.fromJson(json['setor']) : null,
+      tipoDeAmbiente: json['tipoDeAmbiente'] != null ? TipoDeAmbiente.fromJson(json['tipoDeAmbiente']) : null,
     );
   }
 
@@ -28,7 +28,7 @@ class Ambiente {
       'id': id,
       'descricao': descricao,
       'setor': setor?.toJson(setor!),
-      'tipoDeAmbiente': tipoDeAmbiente?.toJson(tipoDeAmbiente!),
+      'tipoDeAmbiente': tipoDeAmbiente?.toJson(),
     };
   }
 

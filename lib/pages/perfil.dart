@@ -68,7 +68,7 @@ class _PerfilState extends State<Perfil> {
                       padding: const EdgeInsets.only(
                           right: 16, left: 16, bottom: 40, top: 20),
                       child: Text(
-                        '$nome',
+                        '${nome?[0].toUpperCase()}${nome?.substring(1)}',
                         style: TextStyle(
                           color: Color.fromRGBO(1, 28, 57, 1),
                           fontSize: 32,

@@ -115,7 +115,7 @@ class _AgendaState extends State<Agenda> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 32.0),
             child: Text(
-              'Bem-vindo(a), $nome',
+              'Bem-vindo(a), ${nome?[0].toUpperCase()}${nome?.substring(1)}',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: const Color.fromRGBO(1, 28, 57, 1),

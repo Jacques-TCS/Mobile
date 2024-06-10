@@ -30,7 +30,7 @@ class _AgendaState extends State<Agenda> {
     _loadPreferences().then((_) {
       _allServicos = getServicos(filterByDataHora: false);
       _servicosAbertosHoje = _allServicos?.then((servicos) => servicos
-          .where((s) => s.dataHoraInicio == null && s.dataHoraFim == null)
+          .where((s) => s.dataHoraFim == null)
           .toList());
     }).catchError((error) {
       print('Erro ao buscar serviços: $error');
@@ -87,7 +87,7 @@ class _AgendaState extends State<Agenda> {
         if (filterByDataHora) {
           servicos = servicos
               .where((servico) =>
-                  servico.dataHoraInicio == null && servico.dataHoraFim == null)
+                  servico.dataHoraFim == null)
               .toList();
         }
 
@@ -326,7 +326,7 @@ class _AgendaState extends State<Agenda> {
         height: MediaQuery.of(context).size.height * 0.5,
         child: FutureBuilder<List<Servico>>(
           future: _allServicos?.then((servicos) => servicos
-              .where((s) => s.dataHoraInicio != null && s.dataHoraFim != null)
+              .where((s) => s.dataHoraFim != null)
               .toList()),
           builder:
               (BuildContext context, AsyncSnapshot<List<Servico>> snapshot) {

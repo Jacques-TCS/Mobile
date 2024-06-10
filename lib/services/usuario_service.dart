@@ -65,4 +65,37 @@ class UsuarioService {
       return http.Response({'message': e}.toString(), 400);
     }
   }
+
+  Future<http.Response> resetPassword(String email) async {
+    try {
+      Uri uri = Uri.parse('$_baseUrl/recuperar-senha');
+      Map<String, dynamic> body = {
+        'email': email,
+      };
+      String bodyString = json.encode(body);
+      http.Response response = await http.post(uri, headers: headers, body: bodyString);
+      return response;
+    } catch (e) {
+      return http.Response({'message': e}.toString(), 400);
+    }
+  }
+
+Future<http.Response> changePassword(String password, String token) async {
+    try {
+      Uri uri = Uri.parse('$_baseUrl/redefinir-senha');
+      Map<String, dynamic> body = {
+        'password': password,
+      };
+      String bodyString = json.encode(body);
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      http.Response response = await http.post(uri, headers: headers, body: bodyString);
+      return response;
+    } catch (e) {
+      return http.Response({'message': e}.toString(), 400);
+    }
+  }
 }

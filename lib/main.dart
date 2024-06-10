@@ -10,8 +10,9 @@ import 'package:mobile/components/qrcode.dart';
 import 'package:mobile/pages/resetar_senha_login.dart';
 import 'package:mobile/pages/resetar_senha_perfil.dart';
 import 'package:mobile/pages/registro_servico.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -22,6 +23,7 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

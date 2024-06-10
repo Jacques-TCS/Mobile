@@ -1,9 +1,42 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last
 
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class ResetarSenhaPerfil extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class ResetarSenhaPerfil extends StatefulWidget {
   const ResetarSenhaPerfil({super.key});
+
+  @override
+  State<ResetarSenhaPerfil> createState() => _ResetarSenhaPerfilState();
+}
+
+class _ResetarSenhaPerfilState extends State<ResetarSenhaPerfil> {
+    String? nome;
+
+  late String token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+    Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nome = prefs.getString('usuario') ?? '';
+      if (nome!.isNotEmpty) {
+        nome = utf8.decode(nome!.codeUnits);
+      }
+      token = prefs.getString('token') ?? '';
+      if (token.isEmpty) {
+        throw Exception('Token é nulo ou vazio');
+      }
+    });
+  }
 
   // This widget is the root of your application.
   @override
@@ -25,38 +58,41 @@ class ResetarSenhaPerfil extends StatelessWidget {
             body: Center(
               child: ListView(
                 children: <Widget>[
-                  SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          right: 16, left: 16, top: 32),
-                      child: Icon(
-                        Icons.person_rounded,
-                        size: 120,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 32.0),
+                    child: ProfilePicture(
+                        name: '$nome',
+                        radius: 60,
+                        fontsize: 40,
+                        count: 2,
+                        
                     ),
                   ),
                   SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          right: 16, left: 16, bottom: 60),
-                      child: Text(
-                        'Nome do usuário',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color.fromRGBO(1, 28, 57, 1),
-                          fontSize: 20,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            right: 16, left: 16, bottom: 40, top: 20),
+                        child: Text(
+                          '${nome?[0].toUpperCase()}${nome?.substring(1)}',
+                          style: TextStyle(
+                            color: Color.fromRGBO(1, 28, 57, 1),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold
+                          ),
                         ),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 70, bottom: 12),
+                    padding: const EdgeInsets.only(left: 60, bottom: 12),
                     child: SizedBox(
                         child: Text(
                           'Informe sua nova senha',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             color: Color.fromRGBO(1, 28, 57, 1),
+                            fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
@@ -91,13 +127,14 @@ class ResetarSenhaPerfil extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 70, bottom: 12),
+                    padding: const EdgeInsets.only(left: 60, bottom: 12),
                     child: SizedBox(
                         child: Text(
                           'Confirme sua nova senha',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             color: Color.fromRGBO(1, 28, 57, 1),
+                            fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),

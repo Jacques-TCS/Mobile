@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/components/qrcode_overlay.dart';
@@ -22,9 +23,16 @@ class QRCode extends StatefulWidget {
 class _QRCodeState extends State<QRCode> {
   String? nome;
   late String token;
-  final MobileScannerController scannerController = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
-  );
+  late MobileScannerController scannerController;
+
+  @override
+  void initState() {
+    super.initState();
+    scannerController = MobileScannerController(
+      detectionSpeed: DetectionSpeed.noDuplicates,
+    );
+    _loadPreferences();
+  }
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -86,6 +94,12 @@ class _QRCodeState extends State<QRCode> {
   }
 
   @override
+  void dispose() {
+    scannerController.stop();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -111,13 +125,11 @@ class _QRCodeState extends State<QRCode> {
               onDetect: (capture) async {
                 final List<Barcode> barcodes = capture.barcodes;
                 for (final barcode in barcodes) {
-                  ('Barcode found! ${barcode.rawValue}');
                   final id = barcode.rawValue?.split(':').last.trim();
-                  (id);
-
                   if (id != null) {
                     try {
-                      List<Servico> servicos = await getServicos(id, filterByDataHora: true);
+                      List<Servico> servicos =
+                          await getServicos(id, filterByDataHora: true);
                       final servicosNoAmbiente = servicos
                           .where((s) => s.ambiente.id.toString() == id)
                           .toList();
@@ -128,103 +140,126 @@ class _QRCodeState extends State<QRCode> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            return AlertDialog(
-                              title:
-                                  Text('Escolha o serviço que deseja iniciar:'),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: servicosNoAmbiente.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    ('Building list item $index');
-                                    return ListTile(
-                                      title: Container(
-                                        alignment: Alignment.center,
-                                        child: SizedBox(
-                                          width: 400,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      RegistroServico(
-                                                    servicoId:
-                                                        servicosNoAmbiente[index]
-                                                            .id,
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                dialogBackgroundColor:
+                                    Color.fromRGBO(220, 242, 252, 1),
+                              ),
+                              child: AlertDialog(
+                                title: Text(
+                                    'Escolha o serviço que deseja iniciar:'),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: servicosNoAmbiente.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      ('Building list item $index');
+                                      return ListTile(
+                                        title: Container(
+                                          alignment: Alignment.center,
+                                          child: SizedBox(
+                                            width: 400,
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        RegistroServico(
+                                                      servicoId:
+                                                          servicosNoAmbiente[
+                                                                  index]
+                                                              .id,
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor: Colors.white,
-                                              backgroundColor: Color.fromRGBO(
-                                                  12, 98, 160, 1), // button color
+                                                );
+                                                await scannerController.stop(); 
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                backgroundColor: Color.fromRGBO(
+                                                    12,
+                                                    98,
+                                                    160,
+                                                    1), // button color
+                                              ),
+                                              child: Text(
+                                                  "#${servicosNoAmbiente[index].id}: ${servicosNoAmbiente[index].tipoDeLimpeza.tipoDeLimpeza}"),
                                             ),
-                                            child: Text(servicosNoAmbiente[index]
-                                                .tipoDeLimpeza
-                                                .tipoDeLimpeza),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              actions: <Widget>[
-                                SizedBox(
-                                  width: 100,
-                                  child: TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, 'Sair');
-                                      _resetScanner();
+                                      );
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor: Color.fromRGBO(
-                                          12, 98, 160, 1), // button color
-                                    ),
-                                    child: const Text('Sair'),
                                   ),
                                 ),
-                              ],
+                                actions: <Widget>[
+                                  SizedBox(
+                                    width: 100,
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context, 'Sair');
+                                        _resetScanner();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: Color.fromRGBO(
+                                            12, 98, 160, 1), // button color
+                                      ),
+                                      child: const Text('Sair'),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             );
                           },
                         );
                       } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Alerta'),
-                              content: Text(
-                                  'Você não possui serviço neste ambiente!'),
-                              actions: <Widget>[
-                                SizedBox(
-                                  width: 100,
-                                  child: TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, 'Sair');
-                                      _resetScanner();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor: Color.fromRGBO(
-                                          12, 98, 160, 1), // text color
-                                    ),
-                                    child: const Text('Sair'),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            elevation: 0,
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.transparent,
+                            duration: Duration(seconds: 2),
+                            content: AwesomeSnackbarContent(
+                              title: 'Atenção!',
+                              message:
+                                  'Você não possui serviço neste ambiente!',
+                              messageFontSize: 15,
+                              contentType: ContentType.warning,
+                              color: const Color.fromARGB(255, 255, 165, 57),
+                              inMaterialBanner: false,
+                            ),
+                          ),
                         );
+                        Future.delayed(Duration(seconds: 2), () {
+                          _resetScanner();
+                        });
                       }
                     } catch (e) {
-                      throw Exception('Erro ao buscar serviços: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          duration: Duration(seconds: 2),
+                          content: AwesomeSnackbarContent(
+                            title: 'Atenção!',
+                            message: 'Você não possui serviço neste ambiente!',
+                            messageFontSize: 15,
+                            contentType: ContentType.warning,
+                            color: const Color.fromARGB(255, 255, 165, 57),
+                            inMaterialBanner: false,
+                          ),
+                        ),
+                      );
+                      Future.delayed(Duration(seconds: 2), () {
+                        _resetScanner();
+                      });
                     }
-                  } 
+                  }
                 }
               },
             ),

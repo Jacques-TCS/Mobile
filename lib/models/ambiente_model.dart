@@ -1,17 +1,16 @@
 import 'setor_model.dart';
-import 'tipo_de_ambiente_model.dart';
+// import 'tipo_de_ambiente_model.dart';
 
 class Ambiente {
   final int id;
   String? descricao;
   Setor? setor;
-  TipoDeAmbiente? tipoDeAmbiente;
+  // TipoDeAmbiente? tipoDeAmbiente;
 
   Ambiente({
     this.id = 0,
     this.descricao,
     this.setor,
-    this.tipoDeAmbiente,
   });
 
   factory Ambiente.fromJson(Map<String, dynamic> json) {
@@ -19,7 +18,7 @@ class Ambiente {
       id: json['id'],
       descricao: json['descricao'],
       setor: json['setor'] != null ? Setor.fromJson(json['setor']) : null,
-      tipoDeAmbiente: json['tipoDeAmbiente'] != null ? TipoDeAmbiente.fromJson(json['tipoDeAmbiente']) : null,
+      // tipoDeAmbiente: json['tipoDeAmbiente'] != null ? TipoDeAmbiente.fromJson(json['tipoDeAmbiente']) : null,
     );
   }
 
@@ -28,12 +27,13 @@ class Ambiente {
       'id': id,
       'descricao': descricao,
       'setor': setor?.toJson(setor!),
-      'tipoDeAmbiente': tipoDeAmbiente?.toJson(),
+      // 'tipoDeAmbiente': tipoDeAmbiente?.toJson(),
     };
   }
 
   @override
   String toString() {
-    return 'Ambiente{id: $id, descricao: $descricao, setor: $setor, tipoDeAmbiente: $tipoDeAmbiente}';
+    return 'Ambiente{id: $id, descricao: $descricao, setor: $setor}';
+    // , tipoDeAmbiente: $tipoDeAmbiente
   }
 }

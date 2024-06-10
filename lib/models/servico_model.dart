@@ -1,7 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:mobile/models/atividade_model.dart';
-import 'package:mobile/models/ocorrencia_model.dart';
 
 import 'ambiente_model.dart';
 import 'cronograma_model.dart';

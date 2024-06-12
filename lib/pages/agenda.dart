@@ -29,9 +29,8 @@ class _AgendaState extends State<Agenda> {
     super.initState();
     _loadPreferences().then((_) {
       _allServicos = getServicos(filterByDataHora: false);
-      _servicosAbertosHoje = _allServicos?.then((servicos) => servicos
-          .where((s) => s.dataHoraFim == null)
-          .toList());
+      _servicosAbertosHoje = _allServicos?.then(
+          (servicos) => servicos.where((s) => s.dataHoraFim == null).toList());
     }).catchError((error) {
       print('Erro ao buscar serviços: $error');
     });
@@ -85,10 +84,8 @@ class _AgendaState extends State<Agenda> {
             .toList();
 
         if (filterByDataHora) {
-          servicos = servicos
-              .where((servico) =>
-                  servico.dataHoraFim == null)
-              .toList();
+          servicos =
+              servicos.where((servico) => servico.dataHoraFim == null).toList();
         }
 
         return servicos;
@@ -113,7 +110,7 @@ class _AgendaState extends State<Agenda> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 32.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 60.0, bottom: 32.0),
             child: Text(
               'Bem-vindo(a), ${nome?[0].toUpperCase()}${nome?.substring(1)}',
               textAlign: TextAlign.left,
@@ -174,7 +171,7 @@ class _AgendaState extends State<Agenda> {
             return Center(child: Text('Erro: ${snapshot.error}'));
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             double containerHeight = snapshot.data!.length *
-                100.0; // Adjust the multiplier as needed
+                100.0;
             double sizedBoxHeight = MediaQuery.of(context).size.height * 0.5;
             double finalHeight = min(containerHeight, sizedBoxHeight);
             return SizedBox(
@@ -322,22 +319,24 @@ class _AgendaState extends State<Agenda> {
           ),
         );
       },
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.5,
-        child: FutureBuilder<List<Servico>>(
-          future: _allServicos?.then((servicos) => servicos
-              .where((s) => s.dataHoraFim != null)
-              .toList()),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Servico>> snapshot) {
-            if (snapshot.hasData) {
-              List<Servico> servicos = snapshot.data!
-                  .where((servico) => servico.dataHoraFim != null)
-                  .toList();
-              if (servicos.isEmpty) {
-                return Center(child: Text('Nenhum serviço concluído'));
-              } else {
-                return ListView.builder(
+      body: FutureBuilder<List<Servico>>(
+        future: _allServicos?.then((servicos) =>
+            servicos.where((s) => s.dataHoraFim != null).toList()),
+        builder: (BuildContext context, AsyncSnapshot<List<Servico>> snapshot) {
+          if (snapshot.hasData) {
+            List<Servico> servicos = snapshot.data!
+                .where((servico) => servico.dataHoraFim != null)
+                .toList();
+            if (servicos.isEmpty) {
+              return Center(child: Text('Nenhum serviço concluído'));
+            } else {
+              double containerHeight = snapshot.data!.length *
+                  100.0; 
+              double sizedBoxHeight = MediaQuery.of(context).size.height * 0.7;
+              double finalHeight = min(containerHeight, sizedBoxHeight);
+              return SizedBox(
+                height: finalHeight,
+                child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: servicos.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -416,15 +415,15 @@ class _AgendaState extends State<Agenda> {
                       ),
                     );
                   },
-                );
-              }
-            } else if (snapshot.hasError) {
-              return Text('Erro: ${snapshot.error}');
-            } else {
-              return CircularProgressIndicator();
+                ),
+              );
             }
-          },
-        ),
+          } else if (snapshot.hasError) {
+            return Text('Erro: ${snapshot.error}');
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
       ),
       isExpanded: _expandedIndex == 1,
     );

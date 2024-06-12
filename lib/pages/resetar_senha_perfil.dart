@@ -183,6 +183,8 @@ class _ResetarSenhaPerfilState extends State<ResetarSenhaPerfil> {
                     labelStyle: TextStyle(
                       color: Color.fromRGBO(1, 28, 57, 1),
                     ),
+                    fillColor: Colors.white70,
+                    filled: true,
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(
@@ -225,6 +227,8 @@ class _ResetarSenhaPerfilState extends State<ResetarSenhaPerfil> {
                     labelStyle: TextStyle(
                       color: Color.fromRGBO(1, 28, 57, 1),
                     ),
+                    fillColor: Colors.white70,
+                    filled: true,
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(

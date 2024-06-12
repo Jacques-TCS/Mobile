@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, prefer_final_fields
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, prefer_final_fields, use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/models/categoria_de_ocorrencia_model.dart';
@@ -26,7 +27,7 @@ class _RegistroServicoState extends State<RegistroServico> {
   late Future<List<CategoriaDeOcorrencia>> ocorrenciasFuture;
   CategoriaDeOcorrencia? selectedOcorrencia;
   bool _showOcorrenciaForm = false;
-  TextEditingController _descricaoController = TextEditingController();
+  TextEditingController? _descricaoController = TextEditingController();
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _RegistroServicoState extends State<RegistroServico> {
 
   @override
   void dispose() {
-    _descricaoController.dispose();
+    _descricaoController?.dispose();
     super.dispose();
   }
 
@@ -105,6 +106,77 @@ class _RegistroServicoState extends State<RegistroServico> {
     }
   }
 
+  Future<void> _finalizarServico() async {
+    try {
+      await _loadPreferences();
+      ServicoService servicoService = ServicoService();
+      Map<String, String> requestHeaders = {
+        'Authorization': 'Bearer $token',
+        ...servicoService.headers,
+      };
+
+      Map<String, dynamic> body = {
+        'id': widget.servicoId,
+        'dataHoraFim': DateTime.now().toIso8601String(),
+        if (selectedOcorrencia != null) ...{
+          'ocorrencia': {
+            'id': selectedOcorrencia?.id,
+            'descricao': _descricaoController?.text,
+          },
+        },
+      };
+      print(body);
+      http.Response response =
+          await servicoService.put('', body, requestHeaders);
+        print(response);
+      if (response.statusCode == 200) {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/home');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            duration: Duration(seconds: 3),
+            content: AwesomeSnackbarContent(
+              title: 'Sucesso!',
+              message: 'Serviço finalizado com sucesso!',
+              messageFontSize: 15,
+              contentType: ContentType.success,
+              color: const Color.fromARGB(255, 0, 128, 0),
+              inMaterialBanner: false,
+            ),
+          ),
+        );
+        setState(() {
+          servicoFuture = getServicos(widget.servicoId);
+        });
+      } else {
+        throw Exception(
+            'Falha ao finalizar o serviço. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          duration: Duration(seconds: 2),
+          content: AwesomeSnackbarContent(
+            title: 'Erro!',
+            message: 'Erro ao finalizar o serviço: $e',
+            messageFontSize: 15,
+            contentType: ContentType.failure,
+            color: const Color.fromARGB(255, 255, 0, 0),
+            inMaterialBanner: false,
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,7 +221,7 @@ class _RegistroServicoState extends State<RegistroServico> {
                     height: 60,
                     child: TextButton(
                       onPressed: () => {
-                        // ! TODO: chamar endpoint de atualizar serviço
+                        _finalizarServico(),
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -206,10 +278,8 @@ class _RegistroServicoState extends State<RegistroServico> {
                               onPressed: () {
                                 setState(() {
                                   _showOcorrenciaForm = false;
-                                  selectedOcorrencia =
-                                      null; 
-                                  _descricaoController
-                                      .clear();
+                                  selectedOcorrencia = null;
+                                  _descricaoController?.clear();
                                 });
                               },
                               style: ElevatedButton.styleFrom(
@@ -218,10 +288,10 @@ class _RegistroServicoState extends State<RegistroServico> {
                                 padding: EdgeInsets.zero,
                                 shape: CircleBorder(),
                               ),
-                              child: Text(
-                                'X',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 20),
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.black,
+                                size: 20,
                               ),
                             ),
                           ],
@@ -405,7 +475,7 @@ class _RegistroServicoState extends State<RegistroServico> {
         text: TextSpan(
           style: TextStyle(
             color: const Color.fromRGBO(1, 28, 57, 1),
-            fontSize: 20,
+            fontSize: 19,
           ),
           children: <TextSpan>[
             TextSpan(
@@ -428,7 +498,7 @@ class _RegistroServicoState extends State<RegistroServico> {
         text: TextSpan(
           style: TextStyle(
             color: const Color.fromRGBO(1, 28, 57, 1),
-            fontSize: 20,
+            fontSize: 19,
           ),
           children: <TextSpan>[
             TextSpan(

@@ -6,7 +6,7 @@ import 'package:mobile/pages/agenda.dart';
 import 'package:mobile/components/navbar.dart';
 import 'package:mobile/pages/login.dart';
 import 'package:mobile/pages/perfil.dart';
-import 'package:mobile/components/qrcode.dart';
+import 'package:mobile/pages/qrcode.dart';
 import 'package:mobile/pages/resetar_senha_login.dart';
 import 'package:mobile/pages/resetar_senha_perfil.dart';
 import 'package:mobile/pages/registro_servico.dart';

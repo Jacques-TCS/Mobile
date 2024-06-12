@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/pages/agenda.dart';
 import 'package:mobile/pages/perfil.dart';
-import 'package:mobile/components/qrcode.dart';
+import 'package:mobile/pages/qrcode.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -129,7 +129,7 @@ class _HomeState extends State<Home> {
           ? Colors.transparent
           : Color.fromRGBO(233, 248, 255, 1),
       statusBarIconBrightness:
-          paginaAtual == 1 ? Brightness.light : Brightness.dark,
+          paginaAtual == 1 ? Brightness.dark : Brightness.light,
     );
   }
 }

@@ -36,7 +36,7 @@ class TipoDeLimpeza {
     return TipoDeLimpeza.fromId(json['id']);
   }
 
-  Map<String, dynamic> toJson(TipoDeLimpeza tipoDeLimpeza) {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'tipoDeLimpeza': tipoDeLimpeza,

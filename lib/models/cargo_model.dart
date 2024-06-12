@@ -34,7 +34,7 @@ class Cargo {
     return Cargo.fromId(json['id']);
   }
 
-  Map<String, dynamic> toJson(Cargo cargo) {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'cargo': cargo,

@@ -35,7 +35,7 @@ class Usuario {
       'email': email,
       'username': username,
       'password': password,
-      'cargo': cargo!.toJson(cargo!)
+      'cargo': cargo?.toJson()
     };
   }
 

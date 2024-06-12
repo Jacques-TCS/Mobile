@@ -8,7 +8,6 @@ import 'tipo_de_limpeza_model.dart';
 import 'usuario_model.dart';
 
 class Servico {
-
   final int id;
   DateTime? dataProgramada, dataHoraFim, dataHoraInicio;
   Ambiente ambiente;
@@ -17,7 +16,7 @@ class Servico {
   TipoDeLimpeza tipoDeLimpeza;
   List<Atividade> atividades;
   // List<Ocorrencia>? ocorrencias;
-  
+
   Servico({
     this.id = 0,
     this.dataHoraFim,
@@ -36,13 +35,13 @@ class Servico {
       id: json['id'],
       dataHoraFim: json['dataHoraFim'] != null
           ? DateTime.parse(json['dataHoraFim'])
-          : null, 
+          : null,
       dataHoraInicio: json['dataHoraInicio'] != null
           ? DateTime.parse(json['dataHoraInicio'])
-          : null, 
+          : null,
       dataProgramada: json['dataProgramada'] != null
           ? DateTime.parse(json['dataProgramada'])
-          : null, 
+          : null,
       ambiente: Ambiente.fromJson(json['ambiente']),
       usuario: Usuario.fromJson(json['usuario']),
       cronograma: Cronograma.fromJson(json['cronograma']),
@@ -50,7 +49,7 @@ class Servico {
       atividades: (json['atividades'] as List)
           .map((atividade) => Atividade.fromJson(atividade))
           .toList(),
-      // ocorrencias: json['ocorrencia'] != null 
+      // ocorrencias: json['ocorrencia'] != null
       //     ? (json['ocorrencia'] as List).map((ocorrencia) => Ocorrencia.fromJson(ocorrencia)).toList()
       //     : null,
     );
@@ -59,17 +58,19 @@ class Servico {
   Map<String, dynamic> toJson(Servico servico) {
     return {
       'id': id,
-      'dataHoraFim': dataHoraFim.toString(),
-      'dataHoraInicio': dataHoraInicio.toString(),
-      'dataProgramada': dataProgramada.toString(),
+      'dataHoraFim': dataHoraFim?.toIso8601String(),
+      'dataHoraInicio': dataHoraInicio?.toIso8601String(),
+      'dataProgramada': dataProgramada?.toIso8601String(),
       'ambiente': ambiente.toJson(ambiente),
       'usuario': usuario.toJson(usuario),
       'cronograma': cronograma.toJson(cronograma),
-      'tipoDeLimpeza': tipoDeLimpeza.toJson(tipoDeLimpeza),
-      'atividades': atividades.map((atividade) => atividade.toJson(atividade)).toList(),
+      'tipoDeLimpeza': tipoDeLimpeza.toJson(),
+      'atividades':
+          atividades.map((atividade) => atividade.toJson(atividade)).toList(),
       // 'ocorrencia': ocorrencias?.map((ocorrencia) => ocorrencia.toJson(ocorrencia)).toList()
     };
   }
+
 //  ocorrencias: $ocorrencias
   @override
   String toString() {

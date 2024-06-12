@@ -23,7 +23,7 @@ class Cronograma {
     return {
       'id': id,
       'mes': mes,
-      'tipoDeLimpeza': tipoDeLimpeza?.toJson(tipoDeLimpeza!)
+      'tipoDeLimpeza': tipoDeLimpeza?.toJson()
     };
   }
 

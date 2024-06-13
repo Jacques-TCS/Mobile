@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, avoid_print
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -97,7 +97,6 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
       'Authorization': 'Bearer $token',
       ...servicoService.headers,
     };
-    print('Headers: $requestHeaders');
 
     http.Response response =
         await servicoService.get('/servicos-dia', params, requestHeaders);
@@ -129,12 +128,9 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
       'id': servico.id,
       'dataHoraInicio': DateTime.now().toIso8601String(),
     };
-    print(body);
     http.Response response =
         await servicoService.put('', body, requestHeaders);
-        print(response);
     if (response.statusCode == 200) {
-      print("Service updated successfully.");
     } else {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -202,10 +198,8 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
                       final servicosNoAmbiente = servicos
                           .where((s) => s.ambiente.id.toString() == id)
                           .toList();
-                      print('Servicos in ambiente: $servicosNoAmbiente');
 
                       if (servicosNoAmbiente.isNotEmpty) {
-                        print('Showing dialog...');
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -287,7 +281,6 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
             shrinkWrap: true,
             itemCount: servicosNoAmbiente.length,
             itemBuilder: (BuildContext context, int index) {
-              print('Building list item $index');
               return ListTile(
                 title: Container(
                   alignment: Alignment.center,

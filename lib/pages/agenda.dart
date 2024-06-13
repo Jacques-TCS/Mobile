@@ -55,7 +55,6 @@ class _AgendaState extends State<Agenda> {
       if (token.isEmpty) {
         throw Exception('Token é nulo ou vazio');
       }
-      print('Token loaded: $token');
     });
   }
 
@@ -74,7 +73,6 @@ class _AgendaState extends State<Agenda> {
         'Authorization': 'Bearer $token',
         ...servicoService.headers,
       };
-      print('Headers: $requestHeaders');
 
       http.Response response =
           await servicoService.get('/servicos-dia', params, requestHeaders);

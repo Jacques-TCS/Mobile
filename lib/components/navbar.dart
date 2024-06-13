@@ -129,7 +129,7 @@ class _HomeState extends State<Home> {
           ? Colors.transparent
           : Color.fromRGBO(233, 248, 255, 1),
       statusBarIconBrightness:
-          paginaAtual == 1 ? Brightness.dark : Brightness.light,
+          paginaAtual == 1 ? Brightness.light : Brightness.dark,
     );
   }
 }

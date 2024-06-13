@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, prefer_final_fields, use_build_context_synchronously, avoid_print
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, prefer_final_fields, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -119,16 +119,18 @@ class _RegistroServicoState extends State<RegistroServico> {
         'id': widget.servicoId,
         'dataHoraFim': DateTime.now().toIso8601String(),
         if (selectedOcorrencia != null) ...{
-          'ocorrencia': {
-            'id': selectedOcorrencia?.id,
-            'descricao': _descricaoController?.text,
-          },
+          'ocorrencias': [
+            {
+              'descricao': _descricaoController?.text,
+              'categoria': {
+                'id': selectedOcorrencia?.id,
+              },
+            }
+          ],
         },
       };
-      print(body);
       http.Response response =
           await servicoService.put('', body, requestHeaders);
-        print(response);
       if (response.statusCode == 200) {
         Navigator.pop(context);
         Navigator.pushNamed(context, '/home');
@@ -381,6 +383,10 @@ class _RegistroServicoState extends State<RegistroServico> {
                               filled: true,
                               fillColor: Colors.white,
                             ),
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (value) {
+                              FocusScope.of(context).unfocus();
+                            },
                           ),
                         )
                       ],

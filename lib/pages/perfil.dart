@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
+import 'package:mobile/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Perfil extends StatefulWidget {
@@ -14,7 +15,6 @@ class Perfil extends StatefulWidget {
 }
 
 class _PerfilState extends State<Perfil> {
-
   String? nome;
   late String token;
 
@@ -24,7 +24,7 @@ class _PerfilState extends State<Perfil> {
     _loadPreferences();
   }
 
-    Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       nome = prefs.getString('usuario') ?? '';
@@ -56,11 +56,10 @@ class _PerfilState extends State<Perfil> {
                   Padding(
                     padding: const EdgeInsets.only(top: 32.0),
                     child: ProfilePicture(
-                        name: '$nome',
-                        radius: 60,
-                        fontsize: 40,
-                        count: 2,
-                        
+                      name: '$nome',
+                      radius: 60,
+                      fontsize: 40,
+                      count: 2,
                     ),
                   ),
                   SizedBox(
@@ -70,10 +69,9 @@ class _PerfilState extends State<Perfil> {
                       child: Text(
                         '${nome?[0].toUpperCase()}${nome?.substring(1)}',
                         style: TextStyle(
-                          color: Color.fromRGBO(1, 28, 57, 1),
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold
-                        ),
+                            color: Color.fromRGBO(1, 28, 57, 1),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -140,19 +138,20 @@ class _PerfilState extends State<Perfil> {
                     padding: const EdgeInsets.symmetric(horizontal: 80),
                     child: ElevatedButton(
                       onPressed: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.remove('token');
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => Login()),
+                        );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('Sair', 
-                          style: 
-                          TextStyle(
-                            fontSize: 16, 
-                            fontWeight: FontWeight.bold, 
-                            color: Color.fromRGBO(1, 28, 57, 1),
+                          Text(
+                            'Sair',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(1, 28, 57, 1),
                             ),
                           ),
                           SizedBox(width: 12),

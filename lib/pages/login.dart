@@ -32,7 +32,6 @@ class _LoginState extends State<Login> {
           prefs.setString('token', body['token']);
           Navigator.pushReplacementNamed(context, '/home');
         } else {
-          // Logic for non-Colaborador profiles
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               padding: EdgeInsets.symmetric(vertical: 20),

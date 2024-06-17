@@ -72,9 +72,41 @@ class _QRCodeState extends State<QRCode> {
             .toList();
 
         if (filterByDataHora) {
+          servicos =
+              servicos.where((servico) => servico.dataHoraFim == null).toList();
+        }
+
+        return servicos;
+      } else {
+        throw Exception(
+            'Falha ao carregar os serviços. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erro ao buscar serviços: $e');
+    }
+  }
+
+  Future<List<Servico>> _getServicosByDataHoraInicio(
+      {bool filterByDataHoraInicio = false}) async {
+    try {
+      await _loadPreferences();
+      ServicoService servicoService = ServicoService();
+      Map<String, String> params = {};
+      Map<String, String> requestHeaders = {
+        'Authorization': 'Bearer $token',
+        ...servicoService.headers,
+      };
+
+      http.Response response =
+          await servicoService.get('/servicos-dia', params, requestHeaders);
+      if (response.statusCode == 200) {
+        List<Servico> servicos = (jsonDecode(response.body) as List)
+            .map((item) => Servico.fromJson(item))
+            .toList();
+
+        if (filterByDataHoraInicio) {
           servicos = servicos
-              .where((servico) =>
-                  servico.dataHoraFim == null)
+              .where((servico) => servico.dataHoraInicio != null)
               .toList();
         }
 
@@ -88,36 +120,6 @@ class _QRCodeState extends State<QRCode> {
     }
   }
 
-Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio = false}) async {
-  try {
-    await _loadPreferences();
-    ServicoService servicoService = ServicoService();
-    Map<String, String> params = {};
-    Map<String, String> requestHeaders = {
-      'Authorization': 'Bearer $token',
-      ...servicoService.headers,
-    };
-
-    http.Response response =
-        await servicoService.get('/servicos-dia', params, requestHeaders);
-    if (response.statusCode == 200) {
-      List<Servico> servicos = (jsonDecode(response.body) as List)
-          .map((item) => Servico.fromJson(item))
-          .toList();
-
-      if (filterByDataHoraInicio) {
-        servicos = servicos.where((servico) => servico.dataHoraInicio != null).toList();
-      }
-
-      return servicos;
-    } else {
-      throw Exception('Falha ao carregar os serviços. Código: ${response.statusCode}');
-    }
-  } catch (e) {
-    throw Exception('Erro ao buscar serviços: $e');
-  }
-}
-
   Future<void> _updateServico(Servico servico) async {
     ServicoService servicoService = ServicoService();
     Map<String, String> requestHeaders = {
@@ -128,33 +130,32 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
       'id': servico.id,
       'dataHoraInicio': DateTime.now().toIso8601String(),
     };
-    http.Response response =
-        await servicoService.put('', body, requestHeaders);
+    http.Response response = await servicoService.put('', body, requestHeaders);
     if (response.statusCode == 200) {
     } else {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        duration: Duration(seconds: 2),
-        content: AwesomeSnackbarContent(
-          title: 'Atenção!',
-          message: 'Você não foi possível iniciar o serviço, tente novamente!',
-          messageFontSize: 15,
-          contentType: ContentType.warning,
-          color: const Color.fromARGB(255, 0, 112, 224),
-          inMaterialBanner: false,
+        SnackBar(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          duration: Duration(seconds: 2),
+          content: AwesomeSnackbarContent(
+            title: 'Atenção!',
+            message:
+                'Você não foi possível iniciar o serviço, tente novamente!',
+            messageFontSize: 15,
+            contentType: ContentType.warning,
+            color: const Color.fromARGB(255, 0, 112, 224),
+            inMaterialBanner: false,
+          ),
         ),
-      ),
-    );
+      );
     }
   }
 
   void _resetScanner() {
-    scannerController.stop();
     scannerController.start();
   }
 
@@ -200,6 +201,7 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
                           .toList();
 
                       if (servicosNoAmbiente.isNotEmpty) {
+                        scannerController.stop();
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -300,11 +302,13 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
             child: TextButton(
               onPressed: () {
                 Navigator.pop(context, 'Sair');
-                _resetScanner();
+                Future.delayed(Duration(seconds: 2), () {
+                  _resetScanner();
+                });
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Color.fromRGBO(12, 98, 160, 1), 
+                backgroundColor: Color.fromRGBO(12, 98, 160, 1),
               ),
               child: const Text('Sair'),
             ),
@@ -314,69 +318,69 @@ Future<List<Servico>> _getServicosByDataHoraInicio({bool filterByDataHoraInicio 
     );
   }
 
-ElevatedButton _botaoEscolherServicoEAtualizarHoraInicio(
-    List<Servico> servicosNoAmbiente, int index, BuildContext context) {
-  return ElevatedButton(
-    onPressed: () async {
-      Servico selectedServico = servicosNoAmbiente[index];
-      List<Servico> servicosComInicio = await _getServicosByDataHoraInicio(filterByDataHoraInicio: true);
-      bool hasOtherOngoingServico = servicosComInicio.any((servico) =>
-          servico.dataHoraFim == null && servico.id != selectedServico.id);
-      if (hasOtherOngoingServico && selectedServico.dataHoraInicio == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            duration: Duration(seconds: 3),
-            content: AwesomeSnackbarContent(
-              title: 'Atenção!',
-              message:
-                  'Já existe um serviço em andamento! Finalize-o antes de iniciar um novo.',
-              messageFontSize: 15,
-              contentType: ContentType.warning,
-              color: const Color.fromARGB(255, 255, 165, 57),
-              inMaterialBanner: false,
+  ElevatedButton _botaoEscolherServicoEAtualizarHoraInicio(
+      List<Servico> servicosNoAmbiente, int index, BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        Servico selectedServico = servicosNoAmbiente[index];
+        List<Servico> servicosComInicio =
+            await _getServicosByDataHoraInicio(filterByDataHoraInicio: true);
+        bool hasOtherOngoingServico = servicosComInicio.any((servico) =>
+            servico.dataHoraFim == null && servico.id != selectedServico.id);
+        if (hasOtherOngoingServico && selectedServico.dataHoraInicio == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              duration: Duration(seconds: 3),
+              content: AwesomeSnackbarContent(
+                title: 'Atenção!',
+                message:
+                    'Já existe um serviço em andamento! Finalize-o antes de iniciar um novo.',
+                messageFontSize: 15,
+                contentType: ContentType.warning,
+                color: const Color.fromARGB(255, 255, 165, 57),
+                inMaterialBanner: false,
+              ),
             ),
-          ),
-        );
-        Navigator.of(context).pop(); 
-        await scannerController.stop();
-        await scannerController.start();
-        return;
-      }
-      if (selectedServico.dataHoraInicio != null) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => RegistroServico(
-              servicoId: selectedServico.id,
+          );
+          Navigator.of(context).pop();
+          await scannerController.stop();
+          await scannerController.start();
+          return;
+        }
+        if (selectedServico.dataHoraInicio != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RegistroServico(
+                servicoId: selectedServico.id,
+              ),
             ),
-          ),
-        );
-        await scannerController.stop();
-        return;
-      }
-      if (selectedServico.dataHoraInicio == null) {
-        selectedServico.dataHoraInicio = DateTime.now();
-        await _updateServico(selectedServico);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => RegistroServico(
-              servicoId: selectedServico.id,
+          );
+          await scannerController.stop();
+          return;
+        }
+        if (selectedServico.dataHoraInicio == null) {
+          selectedServico.dataHoraInicio = DateTime.now();
+          await _updateServico(selectedServico);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RegistroServico(
+                servicoId: selectedServico.id,
+              ),
             ),
-          ),
-        );
-        await scannerController.stop();
-      }
-    },
-    style: ElevatedButton.styleFrom(
-      foregroundColor: Colors.white,
-      backgroundColor: Color.fromRGBO(12, 98, 160, 1), 
-    ),
-    child: Text(
-        "#${servicosNoAmbiente[index].id}: ${servicosNoAmbiente[index].tipoDeLimpeza.tipoDeLimpeza}"),
-  );
-}
-
+          );
+          await scannerController.stop();
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromRGBO(12, 98, 160, 1),
+      ),
+      child: Text(
+          "#${servicosNoAmbiente[index].id}: ${servicosNoAmbiente[index].tipoDeLimpeza.tipoDeLimpeza}"),
+    );
+  }
 }

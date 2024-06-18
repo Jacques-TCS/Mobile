@@ -13,10 +13,35 @@ class ResetarSenhaLogin extends StatefulWidget {
 }
 
 class _ResetarSenhaLoginState extends State<ResetarSenhaLogin> {
-   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
-Future<void> _resetarSenha() async {
+  Future<void> _resetarSenha() async {
     String email = _emailController.text;
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$';
+    RegExp regex = RegExp(pattern);
+
+    if (!regex.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          duration: Duration(seconds: 3),
+          content: AwesomeSnackbarContent(
+            title: 'Atenção!',
+            message: 'Por favor, insira um e-mail válido.',
+            messageFontSize: 15,
+            contentType: ContentType.failure,
+            color: const Color.fromARGB(255, 199, 44, 65),
+            inMaterialBanner: false,
+          ),
+        ),
+      );
+      return; 
+    }
+
     UsuarioService usuarioService = UsuarioService();
 
     try {
@@ -52,7 +77,8 @@ Future<void> _resetarSenha() async {
           duration: Duration(seconds: 3),
           content: AwesomeSnackbarContent(
             title: 'Atenção!',
-            message: 'Erro ao enviar email de recuperação. Verifique se seu e-mail estã correto.',
+            message:
+                'Erro ao enviar email de recuperação. Verifique se seu e-mail está correto.',
             messageFontSize: 15,
             contentType: ContentType.failure,
             color: const Color.fromARGB(255, 199, 44, 65),

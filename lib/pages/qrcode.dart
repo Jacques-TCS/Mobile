@@ -32,6 +32,7 @@ class _QRCodeState extends State<QRCode> {
       detectionSpeed: DetectionSpeed.noDuplicates,
     );
     _loadPreferences();
+    _resetScanner();
   }
 
   Future<void> _loadPreferences() async {
@@ -132,6 +133,24 @@ class _QRCodeState extends State<QRCode> {
     };
     http.Response response = await servicoService.put('', body, requestHeaders);
     if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          duration: Duration(seconds: 5),
+          content: AwesomeSnackbarContent(
+            title: 'Serviço Iniciado!',
+            message:
+                'Realize as suas atividades e volte mais tarde para encerrar o serviço!',
+            messageFontSize: 15,
+            contentType: ContentType.success,
+            color: const Color.fromARGB(255, 0, 128, 0),
+            inMaterialBanner: false,
+          ),
+        ),
+      );
     } else {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -193,34 +212,26 @@ class _QRCodeState extends State<QRCode> {
                 for (final barcode in barcodes) {
                   final id = barcode.rawValue?.split(':').last.trim();
                   if (id != null) {
-                    try {
-                      List<Servico> servicos =
-                          await _getServicos(id, filterByDataHora: true);
-                      final servicosNoAmbiente = servicos
-                          .where((s) => s.ambiente.id.toString() == id)
-                          .toList();
+                    List<Servico> servicos =
+                        await _getServicos(id, filterByDataHora: true);
+                    final servicosNoAmbiente = servicos
+                        .where((s) => s.ambiente.id.toString() == id)
+                        .toList();
 
-                      if (servicosNoAmbiente.isNotEmpty) {
-                        scannerController.stop();
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return _dialogServicos(context, servicosNoAmbiente);
-                          },
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          _alertaAvisoSemServicoAmbiente(),
-                        );
-                        Future.delayed(Duration(seconds: 2), () {
-                          _resetScanner();
-                        });
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        _alertaSemServicoAmbiente(),
+                    if (servicosNoAmbiente.isNotEmpty) {
+                      scannerController.stop();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return _dialogServicos(context, servicosNoAmbiente);
+                        },
                       );
-                      Future.delayed(Duration(seconds: 2), () {
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        _alertaAvisoSemServicoAmbiente(),
+                      );
+                      Future.delayed(Duration(seconds: 1), () {
+                        scannerController.stop();
                         _resetScanner();
                       });
                     }
@@ -230,24 +241,6 @@ class _QRCodeState extends State<QRCode> {
             ),
             QRcodeOverlay(overlayColour: Colors.black.withOpacity(0.3))
           ])),
-    );
-  }
-
-  SnackBar _alertaSemServicoAmbiente() {
-    return SnackBar(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      elevation: 0,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      duration: Duration(seconds: 2),
-      content: AwesomeSnackbarContent(
-        title: 'Atenção!',
-        message: 'Você não possui serviço neste ambiente!',
-        messageFontSize: 15,
-        contentType: ContentType.warning,
-        color: const Color.fromARGB(255, 255, 165, 57),
-        inMaterialBanner: false,
-      ),
     );
   }
 
@@ -302,7 +295,7 @@ class _QRCodeState extends State<QRCode> {
             child: TextButton(
               onPressed: () {
                 Navigator.pop(context, 'Sair');
-                Future.delayed(Duration(seconds: 2), () {
+                Future.delayed(Duration(seconds: 1), () {
                   _resetScanner();
                 });
               },

@@ -185,11 +185,17 @@ class _RegistroServicoState extends State<RegistroServico> {
       backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(233, 248, 255, 1),
-        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/home');
+          },
+        ),
         title: Text(
           'Registro de Serviço',
           style: TextStyle(
-            fontSize: 24, // adjust the size as needed
+            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -49,3 +49,5 @@ app.*.map.json
 /android/app/release
 .idx/dev.nix
 .vscode/settings.json
+android/app/gradle.properties
+release-jacques-key.jks

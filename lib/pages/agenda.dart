@@ -195,7 +195,7 @@ class _AgendaState extends State<Agenda> {
                     );
                   } else {
                     return Text(
-                      'Nenhum serviço encontrado',
+                      'SERVIÇOS DO DIA',
                       style: TextStyle(
                         color: const Color.fromRGBO(1, 28, 57, 1),
                         fontSize: 16,

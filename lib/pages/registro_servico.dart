@@ -68,7 +68,7 @@ class _RegistroServicoState extends State<RegistroServico> {
       http.Response response = await servicoService.get(
           '/${widget.servicoId}', params, requestHeaders);
       if (response.statusCode == 200) {
-        Servico servico = Servico.fromJson(jsonDecode(response.body));
+        Servico servico = Servico.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
         return servico;
       } else {
         throw Exception(
@@ -92,7 +92,7 @@ class _RegistroServicoState extends State<RegistroServico> {
       http.Response response = await categoriaDeOcorrenciaService.get(
           '/todos', params, requestHeaders);
       if (response.statusCode == 200) {
-        List<dynamic> ocorrenciasJson = jsonDecode(response.body);
+        List<dynamic> ocorrenciasJson = jsonDecode(utf8.decode(response.bodyBytes));
         List<CategoriaDeOcorrencia> ocorrencias = ocorrenciasJson
             .map((json) => CategoriaDeOcorrencia.fromJson(json))
             .toList();

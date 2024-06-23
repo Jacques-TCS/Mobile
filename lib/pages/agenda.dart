@@ -78,9 +78,9 @@ class _AgendaState extends State<Agenda> {
       http.Response response =
           await servicoService.get('/servicos-dia', params, requestHeaders);
       if (response.statusCode == 200) {
-        List<Servico> servicos = (jsonDecode(response.body) as List)
-            .map((item) => Servico.fromJson(item))
-            .toList();
+        List<Servico> servicos = (jsonDecode(utf8.decode(response.bodyBytes)) as List)
+          .map((item) => Servico.fromJson(item))
+          .toList();
 
         if (filterByDataHora) {
           servicos =

@@ -30,6 +30,7 @@ class _LoginState extends State<Login> {
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('usuario', body['username']);
           prefs.setString('token', body['token']);
+          prefs.setString('nome', body['nome']);
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

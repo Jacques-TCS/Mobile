@@ -48,7 +48,7 @@ class _AgendaState extends State<Agenda> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      nome = prefs.getString('usuario') ?? '';
+      nome = prefs.getString('nome') ?? '';
       if (nome!.isNotEmpty) {
         nome = utf8.decode(nome!.codeUnits);
       }

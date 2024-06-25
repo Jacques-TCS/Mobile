@@ -518,7 +518,7 @@ class _RegistroServicoState extends State<RegistroServico> {
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             TextSpan(
-              text: '${servico.ambiente.descricao} - ${servico.turno.turno}: ',
+              text: '${servico.ambiente.descricao} - ${servico.turno.turno} ',
             ),
           ],
         ),

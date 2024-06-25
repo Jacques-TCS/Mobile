@@ -112,7 +112,7 @@ class _AgendaState extends State<Agenda> {
             padding: const EdgeInsets.only(
                 left: 16.0, right: 16.0, top: 60.0, bottom: 32.0),
             child: Text(
-              'Bem-vindo(a), ${nome?[0].toUpperCase()}${nome?.substring(1)}',
+              'Bem-vindo(a), ${nome?.split(" ")[0][0].toUpperCase()}${nome?.split(" ")[0].substring(1)}',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: const Color.fromRGBO(1, 28, 57, 1),
@@ -247,7 +247,7 @@ class _AgendaState extends State<Agenda> {
                                 elevation: 2,
                                 child: ListTile(
                                   title: Text(
-                                    '${servico.ambiente.descricao}',
+                                    '${servico.ambiente.descricao} - ${servico.turno.turno}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -297,7 +297,7 @@ class _AgendaState extends State<Agenda> {
                                 onTap: () {
                                   AlertDialog alert = AlertDialog(
                                     title: Text(
-                                      '${servico.ambiente.descricao}',
+                                      '${servico.ambiente.descricao} - ${servico.turno.turno}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -404,7 +404,7 @@ class _AgendaState extends State<Agenda> {
                                   elevation: 2,
                                   child: ListTile(
                                     title: Text(
-                                      '${servico.ambiente.descricao}',
+                                      '${servico.ambiente.descricao} - ${servico.turno.turno}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -485,7 +485,7 @@ class _AgendaState extends State<Agenda> {
                       child: GestureDetector(
                         onTap: () {
                           AlertDialog alert = AlertDialog(
-                            title: Text('${servico.ambiente.descricao}',
+                            title: Text('${servico.ambiente.descricao} - ${servico.turno.turno}',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             content: SizedBox(
                               height: 200,
@@ -544,7 +544,7 @@ class _AgendaState extends State<Agenda> {
                           surfaceTintColor: Colors.transparent,
                           elevation: 2,
                           child: ListTile(
-                            title: Text('${servico.ambiente.descricao}',
+                            title: Text('${servico.ambiente.descricao} - ${servico.turno.turno}',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text(servico.tipoDeLimpeza.tipoDeLimpeza),
                             trailing: const Icon(Icons.check_circle,

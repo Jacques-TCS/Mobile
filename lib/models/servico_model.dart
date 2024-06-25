@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:mobile/models/atividade_model.dart';
+import 'package:mobile/models/turno.dart';
 
 import 'ambiente_model.dart';
 import 'cronograma_model.dart';
@@ -15,6 +16,7 @@ class Servico {
   Cronograma cronograma;
   TipoDeLimpeza tipoDeLimpeza;
   List<Atividade> atividades;
+  Turno turno;
   // List<Ocorrencia>? ocorrencias;
 
   Servico({
@@ -27,6 +29,7 @@ class Servico {
     required this.cronograma,
     required this.tipoDeLimpeza,
     required this.atividades,
+    required this.turno,
     // this.ocorrencias,
   });
 
@@ -49,6 +52,7 @@ class Servico {
       atividades: (json['atividades'] as List)
           .map((atividade) => Atividade.fromJson(atividade))
           .toList(),
+      turno: Turno.fromJson(json['turno']),
       // ocorrencias: json['ocorrencia'] != null
       //     ? (json['ocorrencia'] as List).map((ocorrencia) => Ocorrencia.fromJson(ocorrencia)).toList()
       //     : null,
@@ -67,6 +71,7 @@ class Servico {
       'tipoDeLimpeza': tipoDeLimpeza.toJson(),
       'atividades':
           atividades.map((atividade) => atividade.toJson(atividade)).toList(),
+      'turno': turno.toJson(turno),
       // 'ocorrencia': ocorrencias?.map((ocorrencia) => ocorrencia.toJson(ocorrencia)).toList()
     };
   }
@@ -74,6 +79,6 @@ class Servico {
 //  ocorrencias: $ocorrencias
   @override
   String toString() {
-    return 'Servico{id: $id, dataHoraFim: $dataHoraFim, dataHoraInicio: $dataHoraInicio, dataProgramada: $dataProgramada, ambiente: $ambiente, usuario: $usuario, cronograma: $cronograma, tipoDeLimpeza: $tipoDeLimpeza, atividades: $atividades}';
+    return 'Servico{id: $id, dataHoraFim: $dataHoraFim, dataHoraInicio: $dataHoraInicio, dataProgramada: $dataProgramada, ambiente: $ambiente, usuario: $usuario, cronograma: $cronograma, tipoDeLimpeza: $tipoDeLimpeza, atividades: $atividades, turno: $turno}';
   }
 }

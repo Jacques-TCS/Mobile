@@ -373,7 +373,7 @@ class _QRCodeState extends State<QRCode> {
         backgroundColor: Color.fromRGBO(12, 98, 160, 1),
       ),
       child: Text(
-          "#${servicosNoAmbiente[index].id}: ${servicosNoAmbiente[index].tipoDeLimpeza.tipoDeLimpeza}"),
+          "${servicosNoAmbiente[index].tipoDeLimpeza.tipoDeLimpeza} - ${servicosNoAmbiente[index].turno.turno}"),
     );
   }
 }

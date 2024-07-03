@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile/pages/agenda.dart';
-import 'package:mobile/pages/perfil.dart';
-import 'package:mobile/pages/qrcode.dart';
+import 'package:jacques/pages/agenda.dart';
+import 'package:jacques/pages/perfil.dart';
+import 'package:jacques/pages/qrcode.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});

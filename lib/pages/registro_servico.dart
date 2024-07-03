@@ -5,10 +5,10 @@ import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile/models/categoria_de_ocorrencia_model.dart';
-import 'package:mobile/models/servico_model.dart';
-import 'package:mobile/services/categoria_de_ocorrencia_service.dart';
-import 'package:mobile/services/servico_service.dart';
+import 'package:jacques/models/categoria_de_ocorrencia_model.dart';
+import 'package:jacques/models/servico_model.dart';
+import 'package:jacques/services/categoria_de_ocorrencia_service.dart';
+import 'package:jacques/services/servico_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistroServico extends StatefulWidget {

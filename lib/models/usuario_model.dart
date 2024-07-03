@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_init_to_null
 
-import 'package:mobile/models/cargo_model.dart';
+import 'package:jacques/models/cargo_model.dart';
 
 class Usuario {
   

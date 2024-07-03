@@ -3,9 +3,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mobile/models/usuario_model.dart';
+import 'package:jacques/models/usuario_model.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:mobile/services/usuario_service.dart';
+import 'package:jacques/services/usuario_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {

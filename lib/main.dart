@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile/pages/agenda.dart';
-import 'package:mobile/components/navbar.dart';
-import 'package:mobile/pages/login.dart';
-import 'package:mobile/pages/perfil.dart';
-import 'package:mobile/pages/qrcode.dart';
-import 'package:mobile/pages/resetar_senha_login.dart';
-import 'package:mobile/pages/resetar_senha_perfil.dart';
-import 'package:mobile/pages/registro_servico.dart';
+import 'package:jacques/pages/agenda.dart';
+import 'package:jacques/components/navbar.dart';
+import 'package:jacques/pages/login.dart';
+import 'package:jacques/pages/perfil.dart';
+import 'package:jacques/pages/qrcode.dart';
+import 'package:jacques/pages/resetar_senha_login.dart';
+import 'package:jacques/pages/resetar_senha_perfil.dart';
+import 'package:jacques/pages/registro_servico.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {

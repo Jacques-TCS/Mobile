@@ -4,7 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
-import 'package:mobile/pages/login.dart';
+import 'package:jacques/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Perfil extends StatefulWidget {

@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:mobile/models/atividade_model.dart';
-import 'package:mobile/models/turno.dart';
+import 'package:jacques/models/atividade_model.dart';
+import 'package:jacques/models/turno.dart';
 
 import 'ambiente_model.dart';
 import 'cronograma_model.dart';

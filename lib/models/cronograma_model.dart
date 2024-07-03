@@ -1,4 +1,4 @@
-import 'package:mobile/models/tipo_de_limpeza_model.dart';
+import 'package:jacques/models/tipo_de_limpeza_model.dart';
 
 class Cronograma {
   final int id;

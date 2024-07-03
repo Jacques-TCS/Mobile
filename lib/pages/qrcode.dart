@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile/components/qrcode_overlay.dart';
-import 'package:mobile/models/servico_model.dart';
-import 'package:mobile/pages/registro_servico.dart';
-import 'package:mobile/services/servico_service.dart';
+import 'package:jacques/components/qrcode_overlay.dart';
+import 'package:jacques/models/servico_model.dart';
+import 'package:jacques/pages/registro_servico.dart';
+import 'package:jacques/services/servico_service.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,9 +68,10 @@ class _QRCodeState extends State<QRCode> {
       http.Response response = await servicoService.get(
           '/servicos-dia-ambiente/$id', params, requestHeaders);
       if (response.statusCode == 200) {
-        List<Servico> servicos = (jsonDecode(response.body) as List)
-            .map((item) => Servico.fromJson(item))
-            .toList();
+        List<Servico> servicos =
+            (jsonDecode(utf8.decode(response.bodyBytes)) as List)
+                .map((item) => Servico.fromJson(item))
+                .toList();
 
         if (filterByDataHora) {
           servicos =
@@ -101,9 +102,10 @@ class _QRCodeState extends State<QRCode> {
       http.Response response =
           await servicoService.get('/servicos-dia', params, requestHeaders);
       if (response.statusCode == 200) {
-        List<Servico> servicos = (jsonDecode(response.body) as List)
-            .map((item) => Servico.fromJson(item))
-            .toList();
+        List<Servico> servicos =
+            (jsonDecode(utf8.decode(response.bodyBytes)) as List)
+                .map((item) => Servico.fromJson(item))
+                .toList();
 
         if (filterByDataHoraInicio) {
           servicos = servicos
@@ -262,7 +264,7 @@ class _QRCodeState extends State<QRCode> {
     );
   }
 
-  Theme _dialogServicos(
+Theme _dialogServicos(
       BuildContext context, List<Servico> servicosNoAmbiente) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -272,38 +274,87 @@ class _QRCodeState extends State<QRCode> {
         title: Text('Escolha o serviço que deseja iniciar:'),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: servicosNoAmbiente.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Container(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: 400,
-                    child: _botaoEscolherServicoEAtualizarHoraInicio(
-                        servicosNoAmbiente, index, context),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: 300,
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: servicosNoAmbiente.length,
+              itemBuilder: (BuildContext context, int index) {
+                Servico servico = servicosNoAmbiente[index];
+                return Card(
+                  color: Colors.white,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 2,
+                  margin: EdgeInsets.symmetric(vertical: 4.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          '${servico.tipoDeLimpeza.tipoDeLimpeza} - ${servico.turno.turno}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: servico.atividades
+                              .map((atividade) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: Text(
+                                      atividade.descricao,
+                                      style: TextStyle(
+                                        fontSize: 16.0, // Change this value to your desired font size
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _escolherServicoEAtualizarHoraInicio(
+                                  servicosNoAmbiente, index, context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Color.fromRGBO(12, 98, 160, 1),
+                            ),
+                            child: Text('Iniciar'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
         actions: <Widget>[
-          SizedBox(
-            width: 100,
-            child: TextButton(
-              onPressed: () {
-                Navigator.pop(context, 'Sair');
-                Future.delayed(Duration(seconds: 1), () {
-                  _resetScanner();
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Color.fromRGBO(12, 98, 160, 1),
+          Center(
+            child: SizedBox(
+              width: 150,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context, 'Sair');
+                  Future.delayed(Duration(seconds: 1), () {
+                    _resetScanner();
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Color.fromRGBO(12, 98, 160, 1),
+                ),
+                child: const Text('Sair'),
               ),
-              child: const Text('Sair'),
             ),
           ),
         ],
@@ -311,69 +362,60 @@ class _QRCodeState extends State<QRCode> {
     );
   }
 
-  ElevatedButton _botaoEscolherServicoEAtualizarHoraInicio(
-      List<Servico> servicosNoAmbiente, int index, BuildContext context) {
-    return ElevatedButton(
-      onPressed: () async {
-        Servico selectedServico = servicosNoAmbiente[index];
-        List<Servico> servicosComInicio =
-            await _getServicosByDataHoraInicio(filterByDataHoraInicio: true);
-        bool hasOtherOngoingServico = servicosComInicio.any((servico) =>
-            servico.dataHoraFim == null && servico.id != selectedServico.id);
-        if (hasOtherOngoingServico && selectedServico.dataHoraInicio == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              elevation: 0,
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.transparent,
-              duration: Duration(seconds: 3),
-              content: AwesomeSnackbarContent(
-                title: 'Atenção!',
-                message:
-                    'Já existe um serviço em andamento! Finalize-o antes de iniciar um novo.',
-                messageFontSize: 15,
-                contentType: ContentType.warning,
-                color: const Color.fromARGB(255, 255, 165, 57),
-                inMaterialBanner: false,
-              ),
-            ),
-          );
-          Navigator.of(context).pop();
-          await scannerController.stop();
-          await scannerController.start();
-          return;
-        }
-        if (selectedServico.dataHoraInicio != null) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => RegistroServico(
-                servicoId: selectedServico.id,
-              ),
-            ),
-          );
-          await scannerController.stop();
-          return;
-        }
-        if (selectedServico.dataHoraInicio == null) {
-          selectedServico.dataHoraInicio = DateTime.now();
-          await _updateServico(selectedServico);
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => RegistroServico(
-                servicoId: selectedServico.id,
-              ),
-            ),
-          );
-          await scannerController.stop();
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: Color.fromRGBO(12, 98, 160, 1),
+void _escolherServicoEAtualizarHoraInicio(
+    List<Servico> servicosNoAmbiente, int index, BuildContext context) async {
+  Servico selectedServico = servicosNoAmbiente[index];
+  List<Servico> servicosComInicio =
+      await _getServicosByDataHoraInicio(filterByDataHoraInicio: true);
+  bool hasOtherOngoingServico = servicosComInicio.any((servico) =>
+      servico.dataHoraFim == null && servico.id != selectedServico.id);
+  if (hasOtherOngoingServico && selectedServico.dataHoraInicio == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        duration: Duration(seconds: 3),
+        content: AwesomeSnackbarContent(
+          title: 'Atenção!',
+          message:
+              'Já existe um serviço em andamento! Finalize-o antes de iniciar um novo.',
+          messageFontSize: 15,
+          contentType: ContentType.warning,
+          color: const Color.fromARGB(255, 255, 165, 57),
+          inMaterialBanner: false,
+        ),
       ),
-      child: Text(
-          "${servicosNoAmbiente[index].tipoDeLimpeza.tipoDeLimpeza}: ${servicosNoAmbiente[index].turno.turno.substring(0, 3)}."),
     );
+    Navigator.of(context).pop();
+    await scannerController.stop();
+    await scannerController.start();
+    return;
   }
+  if (selectedServico.dataHoraInicio != null) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RegistroServico(
+          servicoId: selectedServico.id,
+        ),
+      ),
+    );
+    await scannerController.stop();
+    return;
+  }
+  if (selectedServico.dataHoraInicio == null) {
+    selectedServico.dataHoraInicio = DateTime.now();
+    await _updateServico(selectedServico);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RegistroServico(
+          servicoId: selectedServico.id,
+        ),
+      ),
+    );
+    await scannerController.stop();
+  }
+}
+
 }

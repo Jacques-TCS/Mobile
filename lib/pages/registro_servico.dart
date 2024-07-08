@@ -293,6 +293,8 @@ class _RegistroServicoState extends State<RegistroServico> {
                               style: ElevatedButton.styleFrom(
                                 surfaceTintColor: Colors.transparent,
                                 minimumSize: Size(40, 40),
+                                elevation: 2,
+                                backgroundColor: Colors.white,
                                 padding: EdgeInsets.zero,
                                 shape: CircleBorder(),
                               ),
@@ -326,6 +328,8 @@ class _RegistroServicoState extends State<RegistroServico> {
                                         FontWeight.normal), // Text color
                               ),
                               isExpanded: true,
+                              dropdownColor: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
                               underline: SizedBox(),
                               onChanged: (CategoriaDeOcorrencia? newValue) {
                                 setState(() {
@@ -366,9 +370,11 @@ class _RegistroServicoState extends State<RegistroServico> {
                         Material(
                           elevation: 4.0,
                           borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
                           child: TextField(
                             controller: _descricaoController,
                             maxLines: null,
+                            maxLength: 255,
                             decoration: InputDecoration(
                               labelText: 'Descrição da Ocorrência',
                               labelStyle: TextStyle(color: Colors.black),

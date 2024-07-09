@@ -224,25 +224,45 @@ class _RegistroServicoState extends State<RegistroServico> {
                 _listaAtividades(servico),
                 _ocorrencia(),
                 Center(
-                  child: SizedBox(
-                    width: 200,
-                    height: 60,
-                    child: TextButton(
-                      onPressed: () => {
-                        _finalizarServico(),
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Color.fromRGBO(12, 98, 160, 1),
-                      ),
-                      child: const Text(
-                        'Finalizar Serviço',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
+  child: SizedBox(
+    width: 200,
+    height: 60,
+    child: TextButton(
+      onPressed: () {
+        // Check if descricao is not null and categoria.id is null
+        if ((_descricaoController?.text.isNotEmpty ?? false) && selectedOcorrencia?.id == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          duration: Duration(seconds: 2),
+          content: AwesomeSnackbarContent(
+            title: 'Erro!',
+            message: 'Erro ao finalizar o serviço: Selecione uma ocorrência!',
+            messageFontSize: 15,
+            contentType: ContentType.failure,
+            color: const Color.fromARGB(255, 255, 0, 0),
+            inMaterialBanner: false,
+          ),
+        ),
+      );
+        } else {
+          _finalizarServico();
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Color.fromRGBO(12, 98, 160, 1),
+      ),
+      child: const Text(
+        'Finalizar Serviço',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+    ),
+  ),
+),
               ],
             ),
           );
